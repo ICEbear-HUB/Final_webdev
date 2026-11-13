@@ -1,20 +1,22 @@
+
 <aside class="sidebar">
     <div class="sidebar-header">
-        <h2>My App</h2>
+        <h2>Aceplus</h2>
+        <p>Admin Panel</p>
     </div>
 
     <nav>
         <ul>
             <li>
-                <a href="{{ path('app_users') }}">Dashboard</a>
+                <a href="{{ path('app_admin') }}">
+                    Dashboard
+                </a>
             </li>
 
             <li>
-                <a>Users</a>
-            </li>
-
-            <li>
-                <a>Settings</a>
+                <a href="{{ path('admin_users') }}">
+                    Users
+                </a>
             </li>
         </ul>
     </nav>

@@ -1,25 +1,40 @@
+
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}My App{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>{% block title %}Aceplus{% endblock %}</title>
 
         <style>
+            * {
+                box-sizing: border-box;
+            }
+
             body {
                 margin: 0;
                 font-family: Arial, sans-serif;
+                background: #f4f6f9;
             }
 
-            .layout {
+            /* ADMIN LAYOUT */
+            .admin-layout {
                 display: flex;
                 min-height: 100vh;
             }
 
+            /* SIDEBAR */
             .sidebar {
                 width: 250px;
+                min-width: 250px;
                 background: #1f2937;
                 color: white;
                 padding: 20px;
+            }
+
+            .sidebar-header {
+                margin-bottom: 30px;
             }
 
             .sidebar ul {
@@ -28,7 +43,7 @@
             }
 
             .sidebar li {
-                margin-bottom: 10px;
+                margin-bottom: 15px;
             }
 
             .sidebar a {
@@ -36,24 +51,20 @@
                 text-decoration: none;
             }
 
-            .content {
+            .sidebar a:hover {
+                color: #facc15;
+            }
+
+            /* MAIN CONTENT */
+            .admin-content {
                 flex: 1;
+                min-width: 0;
                 padding: 30px;
             }
         </style>
     </head>
 
     <body>
-
-        <div class="layout">
-
-            {% include 'partials/sidebar.html.twig' %}
-
-            <main class="content">
-                {% block body %}{% endblock %}
-            </main>
-
-        </div>
-
+        {% block body %}{% endblock %}
     </body>
-</html>2
+</html>
