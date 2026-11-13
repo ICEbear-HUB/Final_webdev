@@ -20,9 +20,17 @@
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="mb-0">Registered Users</h4>
-                    <span class="badge bg-primary">
-                        Total: {{ users|length }}
-                    </span>
+
+                    <div>
+                        <span class="badge bg-primary">
+                            Total: {{ users|length }}
+                        </span>
+
+                        <a href="{{ path('admin_users_new') }}"
+                           class="btn btn-primary btn-sm ms-2">
+                            + Add New User
+                        </a>
+                    </div>
                 </div>
 
                 <div class="table-responsive">
@@ -37,6 +45,7 @@
                                 <th>Last Name</th>
                                 <th>Roles</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
 
@@ -65,12 +74,32 @@
                                             <span class="badge bg-danger">Inactive</span>
                                         {% endif %}
                                     </td>
+
+                                    <td>
+                                        {% if 'ROLE_ADMIN' not in user.roles %}
+
+                                            <a href="{{ path('admin_users_show', {id: user.id}) }}"
+                                               class="btn btn-info btn-sm mb-1">
+                                                View
+                                            </a>
+
+                                            <a href="{{ path('admin_users_edit', {id: user.id}) }}"
+                                               class="btn btn-warning btn-sm mb-1">
+                                                Edit
+                                            </a>
+
+                                        {% else %}
+
+                                            <span class="text-muted">Protected</span>
+
+                                        {% endif %}
+                                    </td>
                                 </tr>
 
                             {% else %}
 
                                 <tr>
-                                    <td colspan="6" class="text-center">
+                                    <td colspan="7" class="text-center">
                                         No users found.
                                     </td>
                                 </tr>
