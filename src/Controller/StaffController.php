@@ -11,8 +11,8 @@ final class StaffController extends AbstractController
     #[Route('/staff', name: 'app_staff')]
     public function index(): Response
     {
-        return $this->render('staff/index.html.twig', [
-            'controller_name' => 'StaffController',
-        ]);
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
+
+        return $this->render('staff/dashboard.html.twig');
     }
 }

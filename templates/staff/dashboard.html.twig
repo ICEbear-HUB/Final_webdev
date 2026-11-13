@@ -1,0 +1,54 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Staff Dashboard | Aceplus{% endblock %}
+
+{% block body %}
+
+<div class="admin-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Aceplus</h2>
+            <p>Staff Panel</p>
+        </div>
+
+        <nav>
+            <ul>
+                <li>
+                    <a href="{{ path('app_staff') }}">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">Products</a>
+                </li>
+                <li>
+                    <a href="#">My Profile</a>
+                </li>
+                <li>
+                    <a href="{{ path('app_logout') }}">Logout</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="admin-content">
+
+        <h1>Welcome to Aceplus Staff Dashboard!</h1>
+
+        <p class="text-muted">
+            Manage your assigned tasks and access staff features here.
+        </p>
+
+        <div class="card shadow p-4 mt-4">
+            <h4>Staff Portal</h4>
+            <p>
+                Welcome, {{ app.user.firstName }}!
+                You are logged in as a Staff member.
+            </p>
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}
