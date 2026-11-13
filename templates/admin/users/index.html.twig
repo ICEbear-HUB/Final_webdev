@@ -1,0 +1,94 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}User Management | Aceplus{% endblock %}
+
+{% block body %}
+
+<div class="admin-layout">
+
+    {% include 'partials/sidebar.html.twig' %}
+
+    <main class="admin-content">
+
+        <div class="container-fluid">
+
+            <h1 class="mb-2">User Management</h1>
+            <p class="text-muted">Manage registered users and staff accounts.</p>
+
+            <div class="card shadow p-4 mt-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Registered Users</h4>
+                    <span class="badge bg-primary">
+                        Total: {{ users|length }}
+                    </span>
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Roles</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for user in users %}
+
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.firstName }}</td>
+                                    <td>{{ user.lastName }}</td>
+
+                                    <td>
+                                        {% for role in user.roles %}
+                                            <span class="badge bg-info text-dark">
+                                                {{ role }}
+                                            </span>
+                                        {% endfor %}
+                                    </td>
+
+                                    <td>
+                                        {% if user.isActive %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+
+                            {% else %}
+
+                                <tr>
+                                    <td colspan="6" class="text-center">
+                                        No users found.
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

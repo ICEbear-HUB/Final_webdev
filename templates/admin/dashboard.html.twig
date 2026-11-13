@@ -1,0 +1,46 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Aceplus Admin Dashboard{% endblock %}
+
+{% block body %}
+
+<div class="admin-layout">
+
+    {% include 'partials/sidebar.html.twig' %}
+
+    <main class="admin-content">
+
+        <h1>Welcome to Aceplus Admin Dashboard!</h1>
+        <p>Manage your Aceplus Energy Drink website here.</p>
+
+        <div class="row mt-4">
+
+            <div class="col-md-4 mb-3">
+                <div class="card shadow p-3">
+                    <h5>Total Users</h5>
+                    <h2>{{ totalUsers }}</h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card shadow p-3">
+                    <h5>Total Products</h5>
+                    <h2>{{ totalProducts }}</h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card shadow p-3">
+                    <h5>Total Categories</h5>
+                    <h2>{{ totalCategories }}</h2>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}
