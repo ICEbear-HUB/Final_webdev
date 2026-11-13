@@ -1,20 +1,415 @@
+
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello Home Controller!{% endblock %}
+{% block title %}Aceplus | Energy That Moves You{% endblock %}
 
 {% block body %}
+
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    .home-page {
+        background: #111827;
+        color: #f9fafb;
+        min-height: 100vh;
+    }
+
+    .navbar-aceplus {
+        background: #0b1220;
+        border-bottom: 1px solid #374151;
+        padding: 18px 6%;
+    }
+
+    .brand-name {
+        color: #a3e635;
+        font-size: 25px;
+        font-weight: 900;
+        text-decoration: none;
+    }
+
+    .navbar-aceplus .nav-link {
+        color: #d1d5db;
+        margin-left: 18px;
+        font-weight: 600;
+    }
+
+    .navbar-aceplus .nav-link:hover {
+        color: #a3e635;
+    }
+
+    .hero-section {
+        padding: 100px 7%;
+        background: linear-gradient(135deg, #111827, #273449);
+    }
+
+    .hero-title {
+        font-size: clamp(40px, 6vw, 68px);
+        font-weight: 900;
+        line-height: 1.1;
+    }
+
+    .hero-title span {
+        color: #a3e635;
+    }
+
+    .hero-description {
+        color: #9ca3af;
+        font-size: 18px;
+        max-width: 550px;
+        line-height: 1.7;
+    }
+
+    .btn-aceplus {
+        background: #a3e635;
+        color: #111827;
+        border: none;
+        font-weight: 800;
+        padding: 13px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-aceplus:hover {
+        background: #84cc16;
+        color: #111827;
+    }
+
+    .products-section {
+        padding: 75px 6%;
+    }
+
+    .section-title {
+        font-size: 34px;
+        font-weight: 900;
+    }
+
+    .section-title span {
+        color: #a3e635;
+    }
+
+    .product-card {
+        background: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 14px;
+        overflow: hidden;
+        height: 100%;
+        transition: transform .2s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .product-image {
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+    }
+
+    .product-placeholder {
+        height: 230px;
+        background: #273449;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .product-placeholder i {
+        font-size: 65px;
+        color: #a3e635;
+    }
+
+    .product-info {
+        padding: 22px;
+    }
+
+    .product-name {
+        font-weight: 800;
+        font-size: 19px;
+    }
+
+    .product-price {
+        color: #a3e635;
+        font-size: 21px;
+        font-weight: 900;
+    }
+
+    .product-description {
+        color: #9ca3af;
+        min-height: 45px;
+    }
+
+    .btn-view-product {
+        display: block;
+        text-align: center;
+        background: #a3e635;
+        color: #111827;
+        text-decoration: none;
+        padding: 11px;
+        border-radius: 8px;
+        font-weight: 800;
+        margin-top: 15px;
+    }
+
+    .btn-view-product:hover {
+        background: #84cc16;
+        color: #111827;
+    }
+
+    .site-footer {
+        background: #0b1220;
+        border-top: 1px solid #374151;
+        padding: 30px 6%;
+        color: #9ca3af;
+    }
 </style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! </h1>
+<div class="home-page">
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/ARANETA/Activity1/src/Controller/DashboardController.php</code></li>
-        <li>Your template at <code>C:/Users/ARANETA/Activity1/templates/dashboard/index.html.twig</code></li>
-    </ul>
+    {# NAVIGATION #}
+    <nav class="navbar navbar-expand-lg navbar-aceplus">
+
+        <div class="container-fluid">
+
+            <a href="{{ path('app_home') }}" class="brand-name">
+                ACEPLUS
+            </a>
+
+            <button
+                class="navbar-toggler bg-light"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#aceplusNavbar"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="aceplusNavbar">
+
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                    <li class="nav-item">
+                        <a href="{{ path('app_home') }}" class="nav-link">
+                            Home
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="#products" class="nav-link">
+                            Products
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ path('cart_index') }}" class="nav-link">
+                            <i class="bi bi-cart"></i>
+                            Cart
+                        </a>
+                    </li>
+
+                    {% if app.user %}
+
+                        <li class="nav-item">
+                            <span class="nav-link">
+                                Hello, {{ app.user.firstName }}
+                            </span>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ path('app_logout') }}" class="nav-link">
+                                Logout
+                            </a>
+                        </li>
+
+                    {% else %}
+
+                        <li class="nav-item">
+                            <a href="{{ path('app_login') }}" class="nav-link">
+                                Login
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ path('app_register') }}" class="nav-link">
+                                Register
+                            </a>
+                        </li>
+
+                    {% endif %}
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+    {# HERO SECTION #}
+    <section class="hero-section">
+
+        <div class="container-fluid">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-7">
+
+                    <h1 class="hero-title">
+                        ENERGY THAT
+                        <span>MOVES YOU.</span>
+                    </h1>
+
+                    <p class="hero-description mt-4">
+                        Discover Aceplus Energy Drink. Refresh your energy,
+                        stay focused, and keep moving toward your goals.
+                    </p>
+
+                    <a href="#products" class="btn-aceplus mt-3">
+                        Explore Products
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </div>
+
+                <div class="col-lg-5 text-center mt-5 mt-lg-0">
+
+                    <i
+                        class="bi bi-lightning-charge-fill"
+                        style="font-size: 190px; color: #a3e635;"
+                    ></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    {# PRODUCT SECTION #}
+    <section class="products-section" id="products">
+
+        <div class="container-fluid">
+
+            <div class="text-center mb-5">
+
+                <h2 class="section-title">
+                    OUR <span>PRODUCTS</span>
+                </h2>
+
+                <p class="text-secondary">
+                    Discover the Aceplus collection.
+                </p>
+
+            </div>
+
+            <div class="row g-4">
+
+                {% for product in products %}
+
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+
+                        <div class="product-card">
+
+                            {% if product.image %}
+
+                                <img
+                                    src="{{ asset(product.image) }}"
+                                    alt="{{ product.Name }}"
+                                    class="product-image"
+                                >
+
+                            {% else %}
+
+                                <div class="product-placeholder">
+                                    <i class="bi bi-cup-straw"></i>
+                                </div>
+
+                            {% endif %}
+
+                            <div class="product-info">
+
+                                <h5 class="product-name">
+                                    {{ product.Name }}
+                                </h5>
+
+                                <p class="product-description">
+                                    {{ product.description|length > 75
+                                        ? product.description|slice(0, 75) ~ '...'
+                                        : product.description
+                                    }}
+                                </p>
+
+                                <div class="product-price">
+                                    ₱{{ product.price|number_format(2, '.', ',') }}
+                                </div>
+
+                                <p class="small text-secondary mt-2">
+                                    {% if product.stock > 0 %}
+                                        {{ product.stock }} available
+                                    {% else %}
+                                        Out of stock
+                                    {% endif %}
+                                </p>
+
+                                <a
+                                    href="{{ path('customer_product_show', {id: product.id}) }}"
+                                    class="btn-view-product"
+                                >
+                                    View Product
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="col-12 text-center py-5">
+
+                        <i class="bi bi-box-seam fs-1 text-secondary"></i>
+
+                        <h4 class="mt-3">
+                            No Products Available
+                        </h4>
+
+                        <p class="text-secondary">
+                            Please check back later for our products.
+                        </p>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+    {# FOOTER #}
+    <footer class="site-footer">
+
+        <div class="container-fluid text-center">
+
+            <h5 class="brand-name mb-3">
+                ACEPLUS
+            </h5>
+
+            <p>
+                ENERGY THAT MOVES YOU.
+            </p>
+
+            <small>
+                &copy; {{ "now"|date("Y") }} Aceplus. All rights reserved.
+            </small>
+
+        </div>
+
+    </footer>
+
 </div>
+
 {% endblock %}

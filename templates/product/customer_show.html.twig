@@ -1,0 +1,230 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.Name }} | Aceplus{% endblock %}
+
+{% block body %}
+
+<style>
+    .product-page {
+        min-height: 100vh;
+        background: #111827;
+        color: #f9fafb;
+        padding: 55px 6%;
+    }
+
+    .product-container {
+        background: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 18px;
+        padding: 35px;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 420px;
+        object-fit: cover;
+        border-radius: 14px;
+    }
+
+    .product-placeholder {
+        height: 420px;
+        background: #273449;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-placeholder i {
+        font-size: 100px;
+        color: #a3e635;
+    }
+
+    .product-name {
+        font-size: 36px;
+        font-weight: 800;
+    }
+
+    .product-price {
+        font-size: 30px;
+        color: #a3e635;
+        font-weight: 800;
+    }
+
+    .product-description {
+        color: #d1d5db;
+        line-height: 1.8;
+    }
+
+    .quantity-input {
+        background: #111827;
+        color: white;
+        border: 1px solid #374151;
+    }
+
+    .quantity-input:focus {
+        background: #111827;
+        color: white;
+        border-color: #a3e635;
+        box-shadow: none;
+    }
+
+    .btn-aceplus {
+        background: #a3e635;
+        color: #111827;
+        border: none;
+        font-weight: 800;
+        padding: 13px;
+        border-radius: 9px;
+    }
+
+    .btn-aceplus:hover {
+        background: #84cc16;
+        color: #111827;
+    }
+
+    .stock-label {
+        color: #a3e635;
+    }
+</style>
+
+<div class="product-page">
+
+    <div class="container">
+
+        <a href="{{ path('app_home') }}" class="btn btn-outline-light mb-4">
+            <i class="bi bi-arrow-left"></i>
+            Back to Products
+        </a>
+
+        {# FLASH MESSAGES #}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('danger') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <div class="product-container">
+
+            <div class="row g-5 align-items-center">
+
+                {# PRODUCT IMAGE #}
+                <div class="col-lg-6">
+
+                    {% if product.image %}
+
+                        <img
+                            src="{{ asset(product.image) }}"
+                            alt="{{ product.Name }}"
+                            class="product-image"
+                        >
+
+                    {% else %}
+
+                        <div class="product-placeholder">
+                            <i class="bi bi-cup-straw"></i>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                {# PRODUCT INFORMATION #}
+                <div class="col-lg-6">
+
+                    <span class="badge bg-success mb-3">
+                        {{ product.category.Name }}
+                    </span>
+
+                    <h1 class="product-name">
+                        {{ product.Name }}
+                    </h1>
+
+                    <h2 class="product-price mb-4">
+                        ₱{{ product.price|number_format(2, '.', ',') }}
+                    </h2>
+
+                    <hr class="border-secondary">
+
+                    <h5 class="fw-bold">
+                        Product Description
+                    </h5>
+
+                    <p class="product-description">
+                        {{ product.description }}
+                    </p>
+
+                    <p class="stock-label mb-4">
+                        <i class="bi bi-box-seam"></i>
+                        Available Stock: {{ product.stock }}
+                    </p>
+
+                    {# ADD TO CART #}
+                    {% if product.stock > 0 %}
+
+                        <form
+                            method="POST"
+                            action="{{ path('cart_add', {id: product.id}) }}"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="_token"
+                                value="{{ csrf_token('cart_add_' ~ product.id) }}"
+                            >
+
+                            <div class="mb-3">
+
+                                <label for="quantity" class="form-label fw-bold">
+                                    Quantity
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="quantity"
+                                    name="quantity"
+                                    class="form-control quantity-input"
+                                    value="1"
+                                    min="1"
+                                    max="{{ product.stock }}"
+                                    required
+                                >
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="btn btn-aceplus w-100"
+                            >
+                                <i class="bi bi-cart-plus"></i>
+                                Add to Cart
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        <button class="btn btn-secondary w-100" disabled>
+                            Out of Stock
+                        </button>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
