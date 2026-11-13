@@ -1,0 +1,194 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Staff Product Inventory | Aceplus{% endblock %}
+
+{% block body %}
+
+<div class="admin-layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Aceplus</h2>
+            <p>Staff Panel</p>
+        </div>
+
+        <nav>
+            <ul>
+                <li>
+                    <a href="{{ path('app_staff') }}">Dashboard</a>
+                </li>
+                <li>
+                    <a href="{{ path('staff_products') }}">Products</a>
+                </li>
+                <li>
+                    <a href="#">My Profile</a>
+                </li>
+                <li>
+                    <a href="{{ path('app_logout') }}">Logout</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="admin-content">
+
+        <h1>Product Inventory</h1>
+
+        <p class="text-muted">
+            View products and manage available stock quantities.
+        </p>
+
+        {# SUCCESS MESSAGES #}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {# ERROR MESSAGES #}
+        {% for message in app.flashes('danger') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <div class="card shadow p-4 mt-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>Available Products</h4>
+
+                <span class="badge bg-primary">
+                    Total: {{ products|length }}
+                </span>
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Available Stock</th>
+                            <th>Stock Status</th>
+                            <th>Manage Stock</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for product in products %}
+
+                            <tr>
+                                <td>{{ product.id }}</td>
+
+                                <td>{{ product.Name }}</td>
+
+                                <td>
+                                    {{ product.category.Name ?? 'Uncategorized' }}
+                                </td>
+
+                                <td>
+                                    ₱{{ product.price|number_format(2, '.', ',') }}
+                                </td>
+
+                                <td>
+                                    <strong>{{ product.stock }}</strong>
+                                </td>
+
+                                <td>
+                                    {% if product.stock <= 10 %}
+                                        <span class="badge bg-danger">
+                                            Low Stock
+                                        </span>
+                                    {% elseif product.stock <= 30 %}
+                                        <span class="badge bg-warning text-dark">
+                                            Limited Stock
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-success">
+                                            In Stock
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                {# ADD OR REMOVE STOCK #}
+                                <td style="min-width: 190px;">
+
+                                    <form method="POST"
+                                          action="{{ path('staff_product_stock_update', {id: product.id}) }}">
+
+                                        <input
+                                            type="number"
+                                            name="quantity"
+                                            min="1"
+                                            required
+                                            class="form-control mb-2"
+                                            placeholder="Enter quantity"
+                                        >
+
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value="{{ csrf_token('update-stock-' ~ product.id) }}"
+                                        >
+
+                                        <div class="d-flex gap-2">
+
+                                            <button
+                                                type="submit"
+                                                name="operation"
+                                                value="add"
+                                                class="btn btn-success btn-sm">
+                                                + Add
+                                            </button>
+
+                                            <button
+                                                type="submit"
+                                                name="operation"
+                                                value="remove"
+                                                class="btn btn-danger btn-sm">
+                                                - Remove
+                                            </button>
+
+                                        </div>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        {% else %}
+
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">
+                                    No products available.
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="mt-3">
+                <a href="{{ path('app_staff') }}" class="btn btn-secondary">
+                    Back to Dashboard
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

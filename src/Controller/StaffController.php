@@ -2,41 +2,41 @@
 
 namespace App\Controller;
 
-use App\Repository\ProductRepository;
+use App\Entity\User;
+use App\Form\StaffProfileType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/staff')]
-final class StaffController extends AbstractController
+final class StaffProfileController extends AbstractController
 {
-    // STAFF DASHBOARD
-    #[Route('', name: 'app_staff', methods: ['GET'])]
-    public function index(ProductRepository $productRepository): Response
-    {
+    #[Route('/profile', name: 'staff_profile', methods: ['GET', 'POST'])]
+    public function index(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
         $this->denyAccessUnlessGranted('ROLE_STAFF');
 
-        $products = $productRepository->findAll();
+        /** @var User $user */
+        $user = $this->getUser();
 
-        $lowStockProducts = array_filter(
-            $products,
-            fn($product) => $product->getStock() <= 10
-        );
+        $form = $this->createForm(StaffProfileType::class, $user);
+        $form->handleRequest($request);
 
-        return $this->render('staff/dashboard.html.twig', [
-            'totalProducts' => count($products),
-            'lowStockProducts' => count($lowStockProducts),
-        ]);
-    }
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
 
-    // STAFF PRODUCT INVENTORY
-    #[Route('/products', name: 'staff_products', methods: ['GET'])]
-    public function products(ProductRepository $productRepository): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_STAFF');
+            $this->addFlash('success', 'Your profile has been updated successfully.');
 
-        return $this->render('staff/products/index.html.twig', [
-            'products' => $productRepository->findAll(),
+            return $this->redirectToRoute('staff_profile');
+        }
+
+        return $this->render('staff/profile.html.twig', [
+            'form' => $form,
+            'user' => $user,
         ]);
     }
 }
