@@ -1,11 +1,25 @@
+
 {% extends 'base.html.twig' %}
 
-{% block title %}New User{% endblock %}
+{% block title %}Create User | Aceplus{% endblock %}
 
 {% block body %}
-    <h1>Create new User</h1>
+<div class="admin-layout">
+    {% include 'partials/sidebar.html.twig' %}
 
-    {{ include('user/_form.html.twig') }}
+    <main class="admin-content">
+        <div class="container-fluid">
+            <h1>Create New User</h1>
+            <p class="text-muted">Register a customer or staff account.</p>
 
-    <a href="{{ path('app_user_index') }}">back to list</a>
+            {{ include('user/_form.html.twig', {
+                button_label: 'Create Account'
+            }) }}
+
+            <a href="{{ path('admin_users') }}" class="btn btn-secondary mt-3">
+                Back to User Management
+            </a>
+        </div>
+    </main>
+</div>
 {% endblock %}
