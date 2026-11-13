@@ -39,7 +39,6 @@ final class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $entityManager->persist($category);
             $entityManager->flush();
 
@@ -100,15 +99,31 @@ final class CategoryController extends AbstractController
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        if ($this->isCsrfTokenValid(
+        // VALIDATE CSRF TOKEN
+        if (!$this->isCsrfTokenValid(
             'delete' . $category->getId(),
             $request->getPayload()->getString('_token')
         )) {
-            $entityManager->remove($category);
-            $entityManager->flush();
+            $this->addFlash('danger', 'Invalid security token.');
 
-            $this->addFlash('success', 'Category deleted successfully.');
+            return $this->redirectToRoute('admin_categories_index');
         }
+
+        // PREVENT DELETING CATEGORY WITH EXISTING PRODUCTS
+        if ($category->getProducts()->count() > 0) {
+            $this->addFlash(
+                'danger',
+                'Cannot delete this category because it still has products assigned to it.'
+            );
+
+            return $this->redirectToRoute('admin_categories_index');
+        }
+
+        // DELETE CATEGORY
+        $entityManager->remove($category);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Category deleted successfully.');
 
         return $this->redirectToRoute('admin_categories_index');
     }
