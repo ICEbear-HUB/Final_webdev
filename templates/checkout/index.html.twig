@@ -1,0 +1,238 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Checkout | Aceplus{% endblock %}
+
+{% block body %}
+
+<style>
+    .checkout-container {
+        max-width: 1150px;
+        margin: 45px auto;
+        padding: 20px;
+        color: #f9fafb;
+    }
+
+    .checkout-title {
+        margin-bottom: 30px;
+    }
+
+    .checkout-title h1 {
+        font-weight: 800;
+    }
+
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 25px;
+    }
+
+    .checkout-card {
+        background: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+    .checkout-card h3 {
+        font-size: 20px;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .checkout-form label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .checkout-form input,
+    .checkout-form textarea {
+        width: 100%;
+        padding: 13px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        border: 1px solid #4b5563;
+        background: #111827;
+        color: white;
+    }
+
+    .checkout-form textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .checkout-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #374151;
+    }
+
+    .checkout-item:last-child {
+        border-bottom: none;
+    }
+
+    .checkout-muted {
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    .checkout-total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 21px;
+        font-weight: 800;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #4b5563;
+    }
+
+    .checkout-total span:last-child {
+        color: #a3e635;
+    }
+
+    .place-order-btn {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background: #a3e635;
+        color: #111827;
+        border: none;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .place-order-btn:hover {
+        background: #84cc16;
+    }
+
+    .back-cart {
+        display: inline-block;
+        color: #a3e635;
+        text-decoration: none;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .checkout-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="checkout-container">
+
+    <a href="{{ path('cart_index') }}" class="back-cart">
+        ← Back to Cart
+    </a>
+
+    <div class="checkout-title">
+        <h1>Checkout</h1>
+        <p class="checkout-muted">
+            Complete your delivery information to place your order.
+        </p>
+    </div>
+
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="checkout-grid">
+
+        <div class="checkout-card">
+
+            <h3>Delivery Information</h3>
+
+            <form method="POST" action="{{ path('checkout_index') }}" class="checkout-form">
+
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token('checkout') }}"
+                >
+
+                <label for="deliveryAddress">Delivery Address</label>
+
+                <textarea
+                    id="deliveryAddress"
+                    name="deliveryAddress"
+                    placeholder="Enter your complete delivery address"
+                    required
+                >{{ defaultAddress }}</textarea>
+
+                <label for="phone">Phone Number</label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value="{{ defaultPhone }}"
+                    placeholder="Enter your phone number"
+                    maxlength="20"
+                    required
+                >
+
+                <button type="submit" class="place-order-btn">
+                    Place Order
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="checkout-card">
+
+            <h3>Order Summary</h3>
+
+            {% for item in cartItems %}
+
+                <div class="checkout-item">
+
+                    <div>
+                        <strong>{{ item.product.Name }}</strong>
+
+                        <div class="checkout-muted">
+                            Quantity: {{ item.quantity }}
+                        </div>
+
+                        <div class="checkout-muted">
+                            ₱{{ item.product.price|number_format(2, '.', ',') }}
+                            each
+                        </div>
+                    </div>
+
+                    <strong>
+                        ₱{{ item.subtotal|number_format(2, '.', ',') }}
+                    </strong>
+
+                </div>
+
+            {% endfor %}
+
+            <div class="checkout-total">
+                <span>Total</span>
+
+                <span>
+                    ₱{{ total|number_format(2, '.', ',') }}
+                </span>
+            </div>
+
+            <p class="checkout-muted" style="margin-top: 15px;">
+                Payment method: Cash on Delivery (COD)
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,102 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Order Successful | Aceplus{% endblock %}
+
+{% block body %}
+
+<style>
+    .success-container {
+        max-width: 650px;
+        margin: 80px auto;
+        padding: 40px 25px;
+        text-align: center;
+        background: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 18px;
+        color: #f9fafb;
+    }
+
+    .success-icon {
+        font-size: 65px;
+        color: #a3e635;
+        margin-bottom: 20px;
+    }
+
+    .success-container h1 {
+        font-weight: 800;
+        margin-bottom: 15px;
+    }
+
+    .success-container p {
+        color: #9ca3af;
+    }
+
+    .order-number {
+        background: #111827;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 25px 0;
+    }
+
+    .order-number strong {
+        color: #a3e635;
+    }
+
+    .success-btn {
+        display: inline-block;
+        padding: 13px 25px;
+        background: #a3e635;
+        color: #111827;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 800;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="success-container">
+
+    <div class="success-icon">
+        <i class="bi bi-check-circle-fill"></i>
+    </div>
+
+    <h1>Order Placed Successfully!</h1>
+
+    <p>
+        Thank you for choosing Aceplus Energy Drink.
+        Your order has been received.
+    </p>
+
+    <div class="order-number">
+        <p>Order Number</p>
+        <strong>{{ order.orderNumber }}</strong>
+    </div>
+
+    <p>
+        Order Status:
+        <strong>{{ order.status }}</strong>
+    </p>
+
+    <p>
+        Total Amount:
+        <strong>₱{{ order.totalAmount|number_format(2, '.', ',') }}</strong>
+    </p>
+
+    <p>
+        Delivery Address:
+        {{ order.deliveryAddress }}
+    </p>
+
+    <p>
+        Phone:
+        {{ order.phone }}
+    </p>
+
+    <a href="{{ path('app_home') }}" class="success-btn">
+        Continue Shopping
+    </a>
+
+</div>
+
+{% endblock %}

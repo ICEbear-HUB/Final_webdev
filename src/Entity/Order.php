@@ -37,12 +37,15 @@ class Order
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?user $user = null;
+    private ?User $user = null;
 
     /**
      * @var Collection<int, OrderItem>
      */
-    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'purchaseOrder')]
+    #[ORM\OneToMany(
+        targetEntity: OrderItem::class,
+        mappedBy: 'purchaseOrder'
+    )]
     private Collection $items;
 
     public function __construct()
@@ -127,12 +130,12 @@ class Order
         return $this;
     }
 
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?user $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 
@@ -160,7 +163,6 @@ class Order
     public function removeItem(OrderItem $item): static
     {
         if ($this->items->removeElement($item)) {
-            // set the owning side to null (unless already changed)
             if ($item->getPurchaseOrder() === $this) {
                 $item->setPurchaseOrder(null);
             }
