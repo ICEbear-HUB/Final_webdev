@@ -19,7 +19,7 @@
                     <a href="{{ path('app_staff') }}">Dashboard</a>
                 </li>
                 <li>
-                    <a href="#">Products</a>
+                    <a href="{{ path('staff_products') }}">Products</a>
                 </li>
                 <li>
                     <a href="#">My Profile</a>
@@ -36,7 +36,7 @@
         <h1>Welcome to Aceplus Staff Dashboard!</h1>
 
         <p class="text-muted">
-            Manage your assigned tasks and access staff features here.
+            Manage your assigned tasks and monitor product inventory.
         </p>
 
         <div class="card shadow p-4 mt-4">
@@ -45,6 +45,30 @@
                 Welcome, {{ app.user.firstName }}!
                 You are logged in as a Staff member.
             </p>
+        </div>
+
+        <div class="row mt-4">
+
+            <div class="col-md-6 mb-3">
+                <div class="card shadow p-4">
+                    <h5>Total Products</h5>
+                    <h2>{{ totalProducts }}</h2>
+                    <a href="{{ path('staff_products') }}">
+                        View Products
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <div class="card shadow p-4">
+                    <h5>Low Stock Products</h5>
+                    <h2>{{ lowStockProducts }}</h2>
+                    <p class="text-muted">
+                        Products with 10 or fewer units remaining.
+                    </p>
+                </div>
+            </div>
+
         </div>
 
     </main>

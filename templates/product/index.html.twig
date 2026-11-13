@@ -1,0 +1,123 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Product Management | Aceplus{% endblock %}
+
+{% block body %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Product Management</h1>
+            <p>Manage your Aceplus products and inventory.</p>
+        </div>
+
+        <a href="{{ path('admin_products_new') }}" class="btn btn-success">
+            + Add New Product
+        </a>
+    </div>
+
+    {# FLASH MESSAGES #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {# PRODUCT TABLE #}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Image</th>
+                    <th>Date Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+
+                        <td>{{ product.Name }}</td>
+
+                        <td>{{ product.category.Name }}</td>
+
+                        <td>{{ product.description }}</td>
+
+                        <td>₱{{ product.price }}</td>
+
+                        <td>{{ product.stock }}</td>
+
+                        <td>
+                            {{ product.image ?? 'No image' }}
+                        </td>
+
+                        <td>
+                            {{ product.createdAt ? product.createdAt|date('M d, Y') : 'N/A' }}
+                        </td>
+
+                        <td>
+                            <div class="d-flex gap-2">
+
+                                <a href="{{ path('admin_products_show', {'id': product.id}) }}"
+                                   class="btn btn-info btn-sm">
+                                    View
+                                </a>
+
+                                <a href="{{ path('admin_products_edit', {'id': product.id}) }}"
+                                   class="btn btn-warning btn-sm">
+                                    Edit
+                                </a>
+
+                                <form method="post"
+                                      action="{{ path('admin_products_delete', {'id': product.id}) }}"
+                                      onsubmit="return confirm('Are you sure you want to delete this product?');">
+
+                                    <input type="hidden"
+                                           name="_token"
+                                           value="{{ csrf_token('delete' ~ product.id) }}">
+
+                                    <button class="btn btn-danger btn-sm">
+                                        Delete
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+                    </tr>
+
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4">
+                            No products found. Start by adding a new product.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+    <a href="{{ path('app_admin') }}" class="btn btn-secondary">
+        Back to Dashboard
+    </a>
+
+</div>
+
+{% endblock %}

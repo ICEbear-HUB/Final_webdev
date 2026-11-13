@@ -1,0 +1,33 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Add New Product | Aceplus{% endblock %}
+
+{% block body %}
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <h1>Add New Product</h1>
+        <p>Create a new product for your Aceplus inventory.</p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            {{ include('product/_form.html.twig', {
+                button_label: 'Save Product'
+            }) }}
+
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{{ path('admin_products_index') }}" class="btn btn-secondary">
+            Back to Products
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

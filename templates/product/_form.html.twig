@@ -1,0 +1,105 @@
+
+{{ form_start(form) }}
+
+    {{ form_errors(form) }}
+
+    {# PRODUCT NAME #}
+    <div class="mb-3">
+        {{ form_label(form.Name, 'Product Name', {
+            'label_attr': {'class': 'form-label'}
+        }) }}
+
+        {{ form_widget(form.Name, {
+            'attr': {
+                'class': 'form-control',
+                'placeholder': 'Enter product name'
+            }
+        }) }}
+
+        {{ form_errors(form.Name) }}
+    </div>
+
+    {# DESCRIPTION #}
+    <div class="mb-3">
+        {{ form_label(form.description, 'Product Description', {
+            'label_attr': {'class': 'form-label'}
+        }) }}
+
+        {{ form_widget(form.description, {
+            'attr': {
+                'class': 'form-control',
+                'placeholder': 'Enter product description',
+                'rows': 4
+            }
+        }) }}
+
+        {{ form_errors(form.description) }}
+    </div>
+
+    {# PRICE #}
+    <div class="mb-3">
+        {{ form_label(form.price, 'Price (₱)', {
+            'label_attr': {'class': 'form-label'}
+        }) }}
+
+        {{ form_widget(form.price, {
+            'attr': {
+                'class': 'form-control',
+                'placeholder': 'Example: 99.99'
+            }
+        }) }}
+
+        {{ form_errors(form.price) }}
+    </div>
+
+    {# STOCK #}
+    <div class="mb-3">
+        {{ form_label(form.stock, 'Available Stock', {
+            'label_attr': {'class': 'form-label'}
+        }) }}
+
+        {{ form_widget(form.stock, {
+            'attr': {
+                'class': 'form-control',
+                'placeholder': 'Enter available stock',
+                'min': 0
+            }
+        }) }}
+
+        {{ form_errors(form.stock) }}
+    </div>
+
+    {# IMAGE #}
+    <div class="mb-3">
+        {{ form_label(form.image, 'Product Image Filename or Path', {
+            'label_attr': {'class': 'form-label'}
+        }) }}
+
+        {{ form_widget(form.image, {
+            'attr': {
+                'class': 'form-control',
+                'placeholder': 'Example: aceplus-original.png'
+            }
+        }) }}
+
+        {{ form_errors(form.image) }}
+    </div>
+
+    {# CATEGORY #}
+    <div class="mb-3">
+        {{ form_label(form.category, 'Product Category', {
+            'label_attr': {'class': 'form-label'}
+        }) }}
+
+        {{ form_widget(form.category, {
+            'attr': {'class': 'form-select'}
+        }) }}
+
+        {{ form_errors(form.category) }}
+    </div>
+
+    <button class="btn btn-success">
+        {{ button_label|default('Save Product') }}
+    </button>
+
+{{ form_end(form) }}
