@@ -21,7 +21,7 @@ security:
             lazy: true
             provider: app_user_provider
 
-            # CHECK ACCOUNT STATUS BEFORE LOGIN
+            # BLOCK DISABLED ACCOUNTS
             user_checker: App\Security\UserChecker
 
             # LOGIN
