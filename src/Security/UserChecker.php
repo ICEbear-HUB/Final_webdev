@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Security;
@@ -8,18 +7,18 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusExce
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class UserChecker implements LoginSuccessHandlerInterface, UserCheckerInterface
+class UserChecker implements UserCheckerInterface
 {
     public function checkPreAuth(UserInterface $user): void
     {
-        if ($user instanceof User && $user->isActive() === false) {
+        if ($user instanceof User && !$user->isActive()) {
             throw new CustomUserMessageAccountStatusException(
                 'Your account has been disabled. Please contact the administrator.'
             );
         }
     }
 
-    public function LoginSuccessHandler(UserInterface $user): void
+    public function checkPostAuth(UserInterface $user): void
     {
         // No additional checks needed after authentication.
     }
