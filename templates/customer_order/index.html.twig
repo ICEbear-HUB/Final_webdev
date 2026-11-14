@@ -1,0 +1,201 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}My Orders | Aceplus{% endblock %}
+
+{% block body %}
+
+<style>
+    .orders-container {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 20px;
+        color: #fff;
+    }
+
+    .orders-header {
+        margin-bottom: 30px;
+    }
+
+    .orders-header h1 {
+        font-size: 32px;
+        font-weight: 800;
+    }
+
+    .orders-header p {
+        color: #aaa;
+    }
+
+    .order-card {
+        background: #171717;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 18px;
+    }
+
+    .order-top {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+    .order-number {
+        color: #a3e635;
+        font-weight: bold;
+    }
+
+    .order-date {
+        color: #aaa;
+        font-size: 14px;
+    }
+
+    .order-info {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        border-top: 1px solid #333;
+        padding-top: 18px;
+    }
+
+    .order-total {
+        font-size: 20px;
+        font-weight: bold;
+        color: #a3e635;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 7px 13px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        background: #333;
+        color: #fff;
+    }
+
+    .status-pending {
+        background: #713f12;
+        color: #fde68a;
+    }
+
+    .status-processing {
+        background: #1e3a8a;
+        color: #bfdbfe;
+    }
+
+    .status-completed {
+        background: #14532d;
+        color: #bbf7d0;
+    }
+
+    .status-cancelled {
+        background: #7f1d1d;
+        color: #fecaca;
+    }
+
+    .view-order {
+        display: inline-block;
+        background: #a3e635;
+        color: #111;
+        padding: 10px 18px;
+        border-radius: 7px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .view-order:hover {
+        background: #bef264;
+        color: #111;
+    }
+
+    .empty-orders {
+        background: #171717;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 50px 20px;
+        text-align: center;
+    }
+
+    .empty-orders p {
+        color: #aaa;
+    }
+</style>
+
+<div class="orders-container">
+
+    <div class="orders-header">
+        <h1>My Orders</h1>
+        <p>View and track your Aceplus purchases.</p>
+    </div>
+
+    {% for order in orders %}
+
+        <div class="order-card">
+
+            <div class="order-top">
+
+                <div>
+                    <div class="order-number">
+                        {{ order.orderNumber }}
+                    </div>
+
+                    <div class="order-date">
+                        {{ order.createdAt|date('M d, Y - h:i A') }}
+                    </div>
+                </div>
+
+                {% set statusClass = order.status|lower %}
+
+                <span class="status status-{{ statusClass }}">
+                    {{ order.status }}
+                </span>
+
+            </div>
+
+            <div class="order-info">
+
+                <div>
+                    <small style="color: #aaa;">Total Amount</small>
+                    <div class="order-total">
+                        ₱{{ order.totalAmount|number_format(2, '.', ',') }}
+                    </div>
+                </div>
+
+                <div>
+                    <small style="color: #aaa;">Products</small>
+                    <div>
+                        {{ order.items|length }} item(s)
+                    </div>
+                </div>
+
+                <div>
+                    <a href="{{ path('customer_orders_show', {id: order.id}) }}"
+                       class="view-order">
+                        View Details
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-orders">
+            <h2>No Orders Yet</h2>
+            <p>You haven't placed any orders yet.</p>
+
+            <a href="{{ path('app_home') }}" class="view-order">
+                Start Shopping
+            </a>
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

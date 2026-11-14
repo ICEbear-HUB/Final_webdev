@@ -1,0 +1,167 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Order Details | Aceplus{% endblock %}
+
+{% block body %}
+
+<style>
+    .details-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 20px;
+        color: #fff;
+    }
+
+    .details-card {
+        background: #171717;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 22px;
+    }
+
+    .details-card h2 {
+        font-size: 21px;
+        margin-bottom: 20px;
+    }
+
+    .order-highlight {
+        color: #a3e635;
+        font-weight: bold;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 12px 0;
+        border-bottom: 1px solid #333;
+    }
+
+    .detail-label {
+        color: #aaa;
+    }
+
+    .product-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #333;
+    }
+
+    .grand-total {
+        color: #a3e635;
+        font-size: 23px;
+        font-weight: bold;
+    }
+
+    .back-link {
+        display: inline-block;
+        color: #a3e635;
+        text-decoration: none;
+        margin-bottom: 25px;
+    }
+
+    .back-link:hover {
+        color: #bef264;
+    }
+</style>
+
+<div class="details-container">
+
+    <a href="{{ path('customer_orders_index') }}" class="back-link">
+        ← Back to My Orders
+    </a>
+
+    <div class="details-card">
+
+        <h1>Order Details</h1>
+
+        <p class="order-highlight">
+            {{ order.orderNumber }}
+        </p>
+
+        <div class="detail-row">
+            <span class="detail-label">Order Date</span>
+            <strong>{{ order.createdAt|date('M d, Y - h:i A') }}</strong>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Order Status</span>
+            <strong>{{ order.status }}</strong>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Payment Method</span>
+            <strong>Cash on Delivery (COD)</strong>
+        </div>
+
+    </div>
+
+    <div class="details-card">
+
+        <h2>Purchased Products</h2>
+
+        {% for item in order.items %}
+
+            <div class="product-row">
+
+                <div>
+                    <strong>
+                        {{ item.product ? item.product.name : 'Product unavailable' }}
+                    </strong>
+
+                    <div style="color: #aaa; font-size: 14px;">
+                        Quantity: {{ item.quantity }}
+                    </div>
+                </div>
+
+                <div style="text-align: right;">
+                    <div>
+                        ₱{{ item.price|number_format(2, '.', ',') }}
+                    </div>
+
+                    <strong class="order-highlight">
+                        ₱{{ (item.price * item.quantity)|number_format(2, '.', ',') }}
+                    </strong>
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <p>No products found for this order.</p>
+
+        {% endfor %}
+
+        <div class="detail-row" style="border-bottom: none;">
+            <strong>Total Amount</strong>
+
+            <span class="grand-total">
+                ₱{{ order.totalAmount|number_format(2, '.', ',') }}
+            </span>
+        </div>
+
+    </div>
+
+    <div class="details-card">
+
+        <h2>Delivery Information</h2>
+
+        <div class="detail-row">
+            <span class="detail-label">Delivery Address</span>
+            <strong>{{ order.deliveryAddress }}</strong>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Phone Number</span>
+            <strong>{{ order.phone }}</strong>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

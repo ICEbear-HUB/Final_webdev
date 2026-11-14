@@ -203,6 +203,9 @@ final class CheckoutController extends AbstractController
 
                     $order->addItem($orderItem);
 
+                    //save order item to the database
+                    $entityManager->persist($orderItem);
+
                     // DEDUCT PURCHASED QUANTITY
                     $product->setStock(
                         $product->getStock() - $quantity
