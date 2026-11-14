@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\CategoryRepository;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
@@ -14,16 +15,43 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/products')]
 final class ProductController extends AbstractController
 {
-    // DISPLAY ALL PRODUCTS
+    
+    // DISPLAY, SEARCH AND FILTER PRODUCTS
     #[Route('', name: 'admin_products_index', methods: ['GET'])]
-    public function index(ProductRepository $productRepository): Response
-    {
+    public function index(
+        Request $request,
+        ProductRepository $productRepository,
+        CategoryRepository $categoryRepository
+    ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
+        $search = trim($request->query->getString('search'));
+        $categoryId = $request->query->getInt('category');
+        $stockStatus = $request->query->getString('stock');
+
+        // Accept only valid stock filter values
+        if (!in_array($stockStatus, [
+            '',
+            'in_stock',
+            'low_stock',
+            'out_of_stock',
+        ], true)) {
+            $stockStatus = '';
+        }
+
         return $this->render('product/index.html.twig', [
-            'products' => $productRepository->findAll(),
+            'products' => $productRepository->findByFilters(
+                $search,
+                $categoryId > 0 ? $categoryId : null,
+                $stockStatus
+            ),
+            'categories' => $categoryRepository->findAll(),
+            'search' => $search,
+            'selectedCategory' => $categoryId,
+            'selectedStock' => $stockStatus,
         ]);
     }
+
 
     // CREATE PRODUCT
     #[Route('/new', name: 'admin_products_new', methods: ['GET', 'POST'])]
@@ -117,4 +145,15 @@ final class ProductController extends AbstractController
 
         return $this->redirectToRoute('admin_products_index');
     }
+
+
+
+
+
+
+
+
+
+
+
 }

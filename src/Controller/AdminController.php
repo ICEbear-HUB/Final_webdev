@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Form\StaffProfileType;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Repository\ProductRepository;
@@ -156,4 +158,85 @@ final class AdminController extends AbstractController
 
         return $this->redirectToRoute('admin_users');
     }
+
+
+    // ==========================================
+    // ADMIN PROFILE
+    // ==========================================
+
+    #[Route('/admin/profile', name: 'admin_profile', methods: ['GET', 'POST'])]
+    public function profile(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $form = $this->createForm(StaffProfileType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Your admin profile has been updated successfully.');
+
+            return $this->redirectToRoute('admin_profile');
+        }
+
+        return $this->render('admin/profile.html.twig', [
+            'form' => $form,
+            'user' => $user,
+        ]);
+    }
+
+    // ==========================================
+    // ADMIN CHANGE PASSWORD
+    // ==========================================
+
+    #[Route('/admin/profile/password', name: 'admin_change_password', methods: ['GET', 'POST'])]
+    public function changePassword(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($request->isMethod('POST')) {
+            $currentPassword = $request->request->getString('current_password');
+            $newPassword = $request->request->getString('new_password');
+            $confirmPassword = $request->request->getString('confirm_password');
+
+            if (!$this->isCsrfTokenValid(
+                'admin_change_password',
+                $request->request->getString('_token')
+            )) {
+                $this->addFlash('danger', 'Invalid security token. Please try again.');
+            } elseif (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
+                $this->addFlash('danger', 'Your current password is incorrect.');
+            } elseif (strlen($newPassword) < 8) {
+                $this->addFlash('danger', 'Your new password must contain at least 8 characters.');
+            } elseif ($newPassword !== $confirmPassword) {
+                $this->addFlash('danger', 'The new passwords do not match.');
+            } else {
+                $user->setPassword(
+                    $passwordHasher->hashPassword($user, $newPassword)
+                );
+
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Your admin password has been changed successfully.');
+
+                return $this->redirectToRoute('admin_profile');
+            }
+        }
+
+        return $this->render('admin/change_password.html.twig');
+    }
+
 }
+

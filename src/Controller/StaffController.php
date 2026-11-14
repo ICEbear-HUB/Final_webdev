@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Entity\User;
+use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,29 +39,18 @@ final class StaffController extends AbstractController
             ->getSingleScalarResult();
 
         return $this->render('staff/dashboard.html.twig', [
-            // Existing product statistics
             'totalProducts' => count($products),
             'lowStockProducts' => count($lowStockProducts),
-
-            // Order statistics
             'totalOrders' => $orderRepository->count([]),
-            'pendingOrders' => $orderRepository->count([
-                'status' => 'Pending',
-            ]),
-            'processingOrders' => $orderRepository->count([
-                'status' => 'Processing',
-            ]),
-            'completedOrders' => $orderRepository->count([
-                'status' => 'Completed',
-            ]),
-            'cancelledOrders' => $orderRepository->count([
-                'status' => 'Cancelled',
-            ]),
+            'pendingOrders' => $orderRepository->count(['status' => 'Pending']),
+            'processingOrders' => $orderRepository->count(['status' => 'Processing']),
+            'completedOrders' => $orderRepository->count(['status' => 'Completed']),
+            'cancelledOrders' => $orderRepository->count(['status' => 'Cancelled']),
             'totalSales' => $totalSales,
         ]);
     }
 
-    // STAFF PRODUCT INVENTORY
+    // VIEW ALL SHARED PRODUCTS
     #[Route('/products', name: 'staff_products', methods: ['GET'])]
     public function products(ProductRepository $productRepository): Response
     {
@@ -70,7 +61,97 @@ final class StaffController extends AbstractController
         ]);
     }
 
-    // ADD OR REMOVE PRODUCT STOCK
+    // CREATE PRODUCT
+    #[Route('/products/new', name: 'staff_products_new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
+
+        $product = new Product();
+        $form = $this->createForm(ProductType::class, $product);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+
+            if (!$user instanceof User) {
+                throw $this->createAccessDeniedException();
+            }
+
+            $product->setCreatedAt(new \DateTimeImmutable());
+            $product->setCreatedBy($user);
+
+            $entityManager->persist($product);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Product created successfully.');
+
+            return $this->redirectToRoute('staff_products');
+        }
+
+        return $this->render('staff/products/new.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
+    // EDIT OWN PRODUCT ONLY
+    #[Route('/products/{id}/edit', name: 'staff_products_edit', methods: ['GET', 'POST'])]
+    public function edit(
+        Request $request,
+        Product $product,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
+        $this->denyUnlessProductOwner($product);
+
+        $form = $this->createForm(ProductType::class, $product);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Your product was updated successfully.');
+
+            return $this->redirectToRoute('staff_products');
+        }
+
+        return $this->render('staff/products/edit.html.twig', [
+            'form' => $form,
+            'product' => $product,
+        ]);
+    }
+
+    // DELETE OWN PRODUCT ONLY
+    #[Route('/products/{id}/delete', name: 'staff_products_delete', methods: ['POST'])]
+    public function delete(
+        Request $request,
+        Product $product,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_STAFF');
+        $this->denyUnlessProductOwner($product);
+
+        $token = $request->getPayload()->getString('_token');
+
+        if (!$this->isCsrfTokenValid(
+            'delete_staff_product_' . $product->getId(),
+            $token
+        )) {
+            $this->addFlash('danger', 'Invalid security token.');
+            return $this->redirectToRoute('staff_products');
+        }
+
+        $entityManager->remove($product);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Your product was deleted successfully.');
+
+        return $this->redirectToRoute('staff_products');
+    }
+
+    // ADD OR REMOVE STOCK - OWN PRODUCTS ONLY
     #[Route('/products/{id}/stock', name: 'staff_product_stock_update', methods: ['POST'])]
     public function updateStock(
         Request $request,
@@ -78,6 +159,7 @@ final class StaffController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_STAFF');
+        $this->denyUnlessProductOwner($product);
 
         $token = $request->getPayload()->getString('_token');
 
@@ -107,7 +189,7 @@ final class StaffController extends AbstractController
             $newStock = $currentStock + $quantity;
         } elseif ($operation === 'remove') {
             if ($quantity > $currentStock) {
-                $this->addFlash('danger', 'Cannot remove more stock than currently available.');
+                $this->addFlash('danger', 'Cannot remove more stock than available.');
                 return $this->redirectToRoute('staff_products');
             }
 
@@ -120,12 +202,28 @@ final class StaffController extends AbstractController
         $product->setStock($newStock);
         $entityManager->flush();
 
-        $message = $operation === 'add'
-            ? $quantity . ' units added successfully.'
-            : $quantity . ' units removed successfully.';
-
-        $this->addFlash('success', $message);
+        $this->addFlash(
+            'success',
+            $operation === 'add'
+                ? $quantity . ' units added successfully.'
+                : $quantity . ' units removed successfully.'
+        );
 
         return $this->redirectToRoute('staff_products');
+    }
+
+    // CHECK PRODUCT OWNERSHIP
+    private function denyUnlessProductOwner(Product $product): void
+    {
+        $user = $this->getUser();
+
+        if (
+            !$user instanceof User ||
+            $product->getCreatedBy()?->getId() !== $user->getId()
+        ) {
+            throw $this->createAccessDeniedException(
+                'You can only manage products created by your account.'
+            );
+        }
     }
 }

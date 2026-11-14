@@ -7,7 +7,7 @@
 
 <div class="container mt-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
             <h1>Product Management</h1>
             <p>Manage your Aceplus products and inventory.</p>
@@ -20,16 +20,84 @@
 
     {# FLASH MESSAGES #}
     {% for message in app.flashes('success') %}
-        <div class="alert alert-success">
-            {{ message }}
-        </div>
+        <div class="alert alert-success">{{ message }}</div>
     {% endfor %}
 
     {% for message in app.flashes('danger') %}
-        <div class="alert alert-danger">
-            {{ message }}
-        </div>
+        <div class="alert alert-danger">{{ message }}</div>
     {% endfor %}
+
+    {# SEARCH AND FILTER #}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">Search and Filter Products</h5>
+
+            <form method="GET" action="{{ path('admin_products_index') }}">
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <label class="form-label">Search Product</label>
+                        <input
+                            type="text"
+                            name="search"
+                            class="form-control"
+                            placeholder="Enter product name..."
+                            value="{{ search }}"
+                        >
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-select">
+                            <option value="">All Categories</option>
+
+                            {% for category in categories %}
+                                <option
+                                    value="{{ category.id }}"
+                                    {% if selectedCategory == category.id %}selected{% endif %}
+                                >
+                                    {{ category.Name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Stock Status</label>
+                        <select name="stock" class="form-select">
+                            <option value="">All Stock</option>
+                            <option value="in_stock" {% if selectedStock == 'in_stock' %}selected{% endif %}>
+                                In Stock
+                            </option>
+                            <option value="low_stock" {% if selectedStock == 'low_stock' %}selected{% endif %}>
+                                Low Stock
+                            </option>
+                            <option value="out_of_stock" {% if selectedStock == 'out_of_stock' %}selected{% endif %}>
+                                Out of Stock
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            Search
+                        </button>
+
+                        <a href="{{ path('admin_products_index') }}"
+                           class="btn btn-secondary">
+                            Reset
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# PRODUCT COUNT #}
+    <p class="text-muted">
+        Showing {{ products|length }} product(s).
+    </p>
 
     {# PRODUCT TABLE #}
     <div class="table-responsive">
@@ -53,27 +121,29 @@
                 {% for product in products %}
                     <tr>
                         <td>{{ product.id }}</td>
-
                         <td>{{ product.Name }}</td>
-
-                        <td>{{ product.category.Name }}</td>
-
+                        <td>{{ product.category ? product.category.Name : 'No category' }}</td>
                         <td>{{ product.description }}</td>
-
                         <td>₱{{ product.price }}</td>
 
-                        <td>{{ product.stock }}</td>
-
                         <td>
-                            {{ product.image ?? 'No image' }}
+                            {% if product.stock == 0 %}
+                                <span class="badge bg-danger">Out of Stock</span>
+                            {% elseif product.stock <= 10 %}
+                                <span class="badge bg-warning text-dark">Low Stock ({{ product.stock }})</span>
+                            {% else %}
+                                <span class="badge bg-success">{{ product.stock }}</span>
+                            {% endif %}
                         </td>
+
+                        <td>{{ product.image ?? 'No image' }}</td>
 
                         <td>
                             {{ product.createdAt ? product.createdAt|date('M d, Y') : 'N/A' }}
                         </td>
 
                         <td>
-                            <div class="d-flex gap-2">
+                            <div class="d-flex gap-2 flex-wrap">
 
                                 <a href="{{ path('admin_products_show', {'id': product.id}) }}"
                                    class="btn btn-info btn-sm">
@@ -93,7 +163,7 @@
                                            name="_token"
                                            value="{{ csrf_token('delete' ~ product.id) }}">
 
-                                    <button class="btn btn-danger btn-sm">
+                                    <button type="submit" class="btn btn-danger btn-sm">
                                         Delete
                                     </button>
                                 </form>
@@ -105,7 +175,7 @@
                 {% else %}
                     <tr>
                         <td colspan="9" class="text-center py-4">
-                            No products found. Start by adding a new product.
+                            No products found matching your search or filters.
                         </td>
                     </tr>
                 {% endfor %}

@@ -1,17 +1,13 @@
-
 security:
-    # PASSWORD HASHING
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
-    # USER PROVIDER
     providers:
         app_user_provider:
             entity:
                 class: App\Entity\User
                 property: email
 
-    # FIREWALLS
     firewalls:
         dev:
             pattern: ^/(_profiler(/|$)|(_wdt|assets|build)/)
@@ -20,28 +16,24 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-
-            # BLOCK DISABLED ACCOUNTS
             user_checker: App\Security\UserChecker
 
-            # LOGIN
             form_login:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
                 success_handler: App\Security\LoginSuccessHandler
 
-            # LOGOUT
             logout:
                 path: app_logout
 
-    # ROLE-BASED ACCESS CONTROL
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/staff, roles: ROLE_STAFF }
+        - { path: ^/manage-orders, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/my-orders, roles: ROLE_USER }
         - { path: ^/customer, roles: ROLE_USER }
 
-# TEST ENVIRONMENT
 when@test:
     security:
         password_hashers:
