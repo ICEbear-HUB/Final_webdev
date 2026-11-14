@@ -1,0 +1,192 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Order Details | Aceplus{% endblock %}
+
+{% block body %}
+
+<div class="main-content">
+
+    <div class="page-header">
+        <a href="{{ path('manage_orders_index') }}"
+           class="btn btn-secondary btn-sm mb-3">
+            <i class="bi bi-arrow-left"></i>
+            Back to Orders
+        </a>
+
+        <h1>Order Details</h1>
+        <p>Review customer information and update the order status.</p>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <div class="card p-4 mb-4">
+
+                <h5 class="mb-4">Order Information</h5>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Order Number</small>
+                        <h6>{{ order.orderNumber }}</h6>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Order Date</small>
+                        <h6>
+                            {{ order.createdAt|date('M d, Y - h:i A') }}
+                        </h6>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Customer Email</small>
+                        <h6>{{ order.user.email }}</h6>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Payment Method</small>
+                        <h6>Cash on Delivery (COD)</h6>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card p-4 mb-4">
+
+                <h5 class="mb-4">Purchased Products</h5>
+
+                <div class="table-responsive">
+
+                    <table class="table">
+
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for item in order.items %}
+
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+
+                                    <td>
+                                        ₱{{ item.price|number_format(2) }}
+                                    </td>
+
+                                    <td>{{ item.quantity }}</td>
+
+                                    <td>
+                                        ₱{{ (item.price * item.quantity)|number_format(2) }}
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="text-end mt-3">
+                    <h5>
+                        Total Amount:
+                        <span style="color: #a3e635;">
+                            ₱{{ order.totalAmount|number_format(2) }}
+                        </span>
+                    </h5>
+                </div>
+
+            </div>
+
+            <div class="card p-4">
+
+                <h5 class="mb-4">Delivery Information</h5>
+
+                <div class="mb-3">
+                    <small class="text-muted">Delivery Address</small>
+                    <p class="mb-0">{{ order.deliveryAddress }}</p>
+                </div>
+
+                <div>
+                    <small class="text-muted">Phone Number</small>
+                    <p class="mb-0">{{ order.phone }}</p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card p-4">
+
+                <h5 class="mb-3">Order Status</h5>
+
+                <p class="text-muted">
+                    Current Status:
+                    <strong>{{ order.status }}</strong>
+                </p>
+
+                <form method="POST"
+                      action="{{ path('manage_orders_update_status', {
+                          id: order.id
+                      }) }}">
+
+                    <input type="hidden"
+                           name="_token"
+                           value="{{ csrf_token('update-order-status-' ~ order.id) }}">
+
+                    <label class="form-label" for="status">
+                        Update Status
+                    </label>
+
+                    <select name="status"
+                            id="status"
+                            class="form-select mb-3"
+                            required>
+
+                        {% for status in statuses %}
+
+                            <option value="{{ status }}"
+                                {% if order.status == status %}selected{% endif %}>
+                                {{ status }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-circle"></i>
+                        Update Order Status
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

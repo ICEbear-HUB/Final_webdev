@@ -33,18 +33,24 @@ final class CustomerOrderController extends AbstractController
             );
         }
 
+        // Retrieve only this customer's orders, newest first.
         $orders = $orderRepository->findBy(
             ['user' => $user],
             ['createdAt' => 'DESC']
         );
 
-        return $this->render('customer/orders/index.html.twig', [
+        return $this->render('Customer_order/index.html.twig', [
             'orders' => $orders,
         ]);
     }
 
-    // DISPLAY ORDER DETAILS
-    #[Route('/{id}', name: 'show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    // DISPLAY INDIVIDUAL ORDER DETAILS
+    #[Route(
+        '/{id}',
+        name: 'show',
+        requirements: ['id' => '\d+'],
+        methods: ['GET']
+    )]
     public function show(
         int $id,
         OrderRepository $orderRepository
@@ -66,7 +72,7 @@ final class CustomerOrderController extends AbstractController
             );
         }
 
-        // Only retrieve an order belonging to this customer.
+        // Customers can only access their own orders.
         $order = $orderRepository->findOneBy([
             'id' => $id,
             'user' => $user,
@@ -78,7 +84,7 @@ final class CustomerOrderController extends AbstractController
             );
         }
 
-        return $this->render('customer/orders/show.html.twig', [
+        return $this->render('Customer_order/show.html.twig', [
             'order' => $order,
         ]);
     }

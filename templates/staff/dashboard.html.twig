@@ -8,6 +8,7 @@
 <div class="admin-layout">
 
     <aside class="sidebar">
+
         <div class="sidebar-header">
             <h2>Aceplus</h2>
             <p>Staff Panel</p>
@@ -18,17 +19,27 @@
                 <li>
                     <a href="{{ path('app_staff') }}">Dashboard</a>
                 </li>
+
                 <li>
                     <a href="{{ path('staff_products') }}">Products</a>
                 </li>
+
+                <li>
+                    <a href="{{ path('manage_orders_index') }}">
+                        Order Management
+                    </a>
+                </li>
+
                 <li>
                     <a href="{{ path('staff_profile') }}">My Profile</a>
                 </li>
+
                 <li>
                     <a href="{{ path('app_logout') }}">Logout</a>
                 </li>
             </ul>
         </nav>
+
     </aside>
 
     <main class="admin-content">
@@ -47,12 +58,16 @@
             </p>
         </div>
 
-        <div class="row mt-4">
+        {# EXISTING INVENTORY STATISTICS #}
+        <h3 class="mt-4 mb-3">Inventory Statistics</h3>
+
+        <div class="row">
 
             <div class="col-md-6 mb-3">
                 <div class="card shadow p-4">
                     <h5>Total Products</h5>
                     <h2>{{ totalProducts }}</h2>
+
                     <a href="{{ path('staff_products') }}">
                         View Products
                     </a>
@@ -62,13 +77,73 @@
             <div class="col-md-6 mb-3">
                 <div class="card shadow p-4">
                     <h5>Low Stock Products</h5>
-                    <h2>{{ lowStockProducts }}</h2>
+                    <h2 class="text-warning">{{ lowStockProducts }}</h2>
+
                     <p class="text-muted">
                         Products with 10 or fewer units remaining.
                     </p>
                 </div>
             </div>
 
+        </div>
+
+        {# ORDER STATISTICS #}
+        <h3 class="mt-4 mb-3">Order Statistics</h3>
+
+        <div class="row">
+
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Total Orders</h6>
+                    <h2>{{ totalOrders }}</h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Pending Orders</h6>
+                    <h2 class="text-warning">{{ pendingOrders }}</h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Processing Orders</h6>
+                    <h2 class="text-info">{{ processingOrders }}</h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Completed Orders</h6>
+                    <h2 class="text-success">{{ completedOrders }}</h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Cancelled Orders</h6>
+                    <h2 class="text-danger">{{ cancelledOrders }}</h2>
+                </div>
+            </div>
+
+            <div class="col-md-8 col-lg-6 mb-3">
+                <div class="card shadow p-3">
+                    <h6>Total Sales (Completed Orders)</h6>
+                    <h2 style="color: #a3e635;">
+                        ₱{{ totalSales|number_format(2) }}
+                    </h2>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ path('manage_orders_index') }}"
+               class="btn btn-primary">
+                <i class="bi bi-bag"></i>
+                Manage Customer Orders
+            </a>
         </div>
 
     </main>

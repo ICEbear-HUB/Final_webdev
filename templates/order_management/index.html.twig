@@ -1,0 +1,126 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Orders | Aceplus{% endblock %}
+
+{% block body %}
+
+<div class="main-content">
+
+    <div class="page-header">
+        <h1>Order Management</h1>
+        <p>View and manage all customer orders.</p>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    <div class="card p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">Customer Orders</h5>
+            <span class="badge bg-secondary">
+                {{ orders|length }} Orders
+            </span>
+        </div>
+
+        {% if orders is not empty %}
+
+            <div class="table-responsive">
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order Number</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for order in orders %}
+
+                            <tr>
+                                <td class="fw-bold">
+                                    {{ order.orderNumber }}
+                                </td>
+
+                                <td>
+                                    {{ order.user.email }}
+                                </td>
+
+                                <td>
+                                    {{ order.createdAt|date('M d, Y - h:i A') }}
+                                </td>
+
+                                <td>
+                                    ₱{{ order.totalAmount|number_format(2) }}
+                                </td>
+
+                                <td>
+                                    {% if order.status == 'Pending' %}
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+                                    {% elseif order.status == 'Processing' %}
+                                        <span class="badge bg-info text-dark">
+                                            Processing
+                                        </span>
+                                    {% elseif order.status == 'Completed' %}
+                                        <span class="badge bg-success">
+                                            Completed
+                                        </span>
+                                    {% elseif order.status == 'Cancelled' %}
+                                        <span class="badge bg-danger">
+                                            Cancelled
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            {{ order.status }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <a href="{{ path('manage_orders_show', {
+                                        id: order.id
+                                    }) }}"
+                                       class="btn btn-primary btn-sm">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-5">
+                <i class="bi bi-bag-x fs-1 text-muted"></i>
+                <h5 class="mt-3">No Orders Found</h5>
+                <p class="text-muted">
+                    Customer orders will appear here.
+                </p>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

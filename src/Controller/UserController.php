@@ -54,6 +54,7 @@ final class UserController extends AbstractController
                         : 'ROLE_USER'
                 ]);
 
+                $user->setIsActive(true);
                 $user->setCreatedAt(new \DateTimeImmutable());
 
                 $entityManager->persist($user);
@@ -77,6 +78,12 @@ final class UserController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            throw $this->createAccessDeniedException(
+                'Administrator accounts cannot be viewed here.'
+            );
+        }
+
         return $this->render('user/show.html.twig', [
             'user' => $user,
         ]);
@@ -93,7 +100,6 @@ final class UserController extends AbstractController
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        // Protect administrator accounts from this form.
         if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
             throw $this->createAccessDeniedException(
                 'Administrator accounts cannot be edited here.'
@@ -110,7 +116,9 @@ final class UserController extends AbstractController
 
             $user->setEmail($email);
 
-            $existingUser = $userRepository->findOneBy(['email' => $email]);
+            $existingUser = $userRepository->findOneBy([
+                'email' => $email,
+            ]);
 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $form->addError(new FormError('Please enter a valid email address.'));
@@ -152,7 +160,7 @@ final class UserController extends AbstractController
     }
 
     // DELETE USER
-    #[Route('/{id}', name: 'admin_users_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'admin_users_delete', methods: ['POST'])]
     public function delete(
         Request $request,
         User $user,
@@ -160,29 +168,40 @@ final class UserController extends AbstractController
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        // Never allow this CRUD to delete administrator accounts.
         if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
             throw $this->createAccessDeniedException(
                 'Administrator accounts cannot be deleted here.'
             );
         }
 
-        // Prevent an administrator from deleting their own account.
-        if ($this->getUser() === $user) {
+        $currentUser = $this->getUser();
+
+        if ($currentUser instanceof User && $currentUser->getId() === $user->getId()) {
             throw $this->createAccessDeniedException(
                 'You cannot delete your own account.'
             );
         }
 
-        if ($this->isCsrfTokenValid(
-            'delete' . $user->getId(),
-            $request->getPayload()->getString('_token')
+        if (!$this->isCsrfTokenValid(
+            'delete_user_' . $user->getId(),
+            $request->request->get('_token')
         )) {
-            $entityManager->remove($user);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'User successfully deleted!');
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
+
+        if (!$user->getOrders()->isEmpty()) {
+            $this->addFlash(
+                'error',
+                'This user has existing orders and cannot be deleted. Disable the account instead.'
+            );
+
+            return $this->redirectToRoute('admin_users');
+        }
+
+        $entityManager->remove($user);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'User successfully deleted!');
 
         return $this->redirectToRoute('admin_users');
     }

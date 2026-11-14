@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Repository\ProductRepository;
+use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,8 +16,10 @@ final class StaffController extends AbstractController
 {
     // STAFF DASHBOARD
     #[Route('', name: 'app_staff', methods: ['GET'])]
-    public function index(ProductRepository $productRepository): Response
-    {
+    public function index(
+        ProductRepository $productRepository,
+        OrderRepository $orderRepository
+    ): Response {
         $this->denyAccessUnlessGranted('ROLE_STAFF');
 
         $products = $productRepository->findAll();
@@ -26,9 +29,33 @@ final class StaffController extends AbstractController
             fn($product) => $product->getStock() <= 10
         );
 
+        $totalSales = $orderRepository->createQueryBuilder('o')
+            ->select('COALESCE(SUM(o.totalAmount), 0)')
+            ->where('o.status = :status')
+            ->setParameter('status', 'Completed')
+            ->getQuery()
+            ->getSingleScalarResult();
+
         return $this->render('staff/dashboard.html.twig', [
+            // Existing product statistics
             'totalProducts' => count($products),
             'lowStockProducts' => count($lowStockProducts),
+
+            // Order statistics
+            'totalOrders' => $orderRepository->count([]),
+            'pendingOrders' => $orderRepository->count([
+                'status' => 'Pending',
+            ]),
+            'processingOrders' => $orderRepository->count([
+                'status' => 'Processing',
+            ]),
+            'completedOrders' => $orderRepository->count([
+                'status' => 'Completed',
+            ]),
+            'cancelledOrders' => $orderRepository->count([
+                'status' => 'Cancelled',
+            ]),
+            'totalSales' => $totalSales,
         ]);
     }
 

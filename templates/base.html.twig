@@ -46,6 +46,48 @@
             text-decoration: none;
         }
 
+        /* CUSTOMER NAVIGATION */
+
+        .customer-navbar {
+            background: var(--sidebar);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+        }
+
+        .customer-navbar .navbar-brand {
+            color: var(--primary);
+            font-size: 23px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .customer-navbar .navbar-brand:hover {
+            color: var(--primary-dark);
+        }
+
+        .customer-navbar .nav-link {
+            color: #d1d5db;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .customer-navbar .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .customer-navbar .btn-orders {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 14px;
+        }
+
+        .customer-navbar .btn-orders:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
         /* MAIN LAYOUT */
 
         .admin-layout {
@@ -325,6 +367,32 @@
 </head>
 
 <body>
+
+    {# CUSTOMER NAVIGATION #}
+    {% if app.user
+        and 'ROLE_ADMIN' not in app.user.roles
+        and 'ROLE_STAFF' not in app.user.roles
+    %}
+        <nav class="navbar navbar-expand-lg customer-navbar">
+            <div class="container-fluid px-4">
+
+                <a class="navbar-brand" href="{{ path('app_home') }}">
+                    ACEPLUS
+                </a>
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <a href="{{ path('customer_orders_index') }}"
+                       class="btn btn-orders btn-sm">
+                        <i class="bi bi-bag"></i>
+                        My Orders
+                    </a>
+
+                </div>
+
+            </div>
+        </nav>
+    {% endif %}
 
     {% block body %}{% endblock %}
 
