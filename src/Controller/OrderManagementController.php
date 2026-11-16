@@ -13,13 +13,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/manage-orders', name: 'manage_orders_')]
 final class OrderManagementController extends AbstractController
 {
-    private const ALLOWED_STATUSES = [
-        'Pending',
-        'Processing',
-        'Completed',
-        'Cancelled',
-    ];
-
     private function checkManagementAccess(): void
     {
         if (
@@ -34,17 +27,43 @@ final class OrderManagementController extends AbstractController
 
     // VIEW ALL CUSTOMER ORDERS
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(OrderRepository $orderRepository): Response
+    public function index(Request $request, OrderRepository $orderRepository): Response
     {
         $this->checkManagementAccess();
 
-        $orders = $orderRepository->findBy(
-            [],
-            ['createdAt' => 'DESC']
-        );
+        $statusFilter = trim($request->query->getString('status'));
+        $search = trim($request->query->getString('q'));
+
+        $qb = $orderRepository->createQueryBuilder('o')
+            ->leftJoin('o.user', 'u')
+            ->addSelect('u')
+            ->orderBy('o.createdAt', 'DESC');
+
+        if ($statusFilter !== '' && in_array($statusFilter, Order::ALLOWED_STATUSES, true)) {
+            $qb->andWhere('o.status = :status')
+               ->setParameter('status', $statusFilter);
+        }
+
+        if ($search !== '') {
+            $qb->andWhere('o.orderNumber LIKE :search OR u.email LIKE :search OR o.phone LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        $orders = $qb->getQuery()->getResult();
+
+        $statusCounts = [
+            'All' => $orderRepository->count([]),
+            Order::STATUS_PENDING => $orderRepository->count(['status' => Order::STATUS_PENDING]),
+            Order::STATUS_PROCESSING => $orderRepository->count(['status' => Order::STATUS_PROCESSING]),
+            Order::STATUS_COMPLETED => $orderRepository->count(['status' => Order::STATUS_COMPLETED]),
+            Order::STATUS_CANCELLED => $orderRepository->count(['status' => Order::STATUS_CANCELLED]),
+        ];
 
         return $this->render('order_management/index.html.twig', [
             'orders' => $orders,
+            'selectedStatus' => $statusFilter,
+            'searchQuery' => $search,
+            'statusCounts' => $statusCounts,
         ]);
     }
 
@@ -56,7 +75,7 @@ final class OrderManagementController extends AbstractController
 
         return $this->render('order_management/show.html.twig', [
             'order' => $order,
-            'statuses' => self::ALLOWED_STATUSES,
+            'nextStatuses' => $order->getNextAllowedStatuses(),
         ]);
     }
 
@@ -82,10 +101,26 @@ final class OrderManagementController extends AbstractController
             ]);
         }
 
-        $newStatus = $request->getPayload()->getString('status');
+        $newStatus = trim($request->getPayload()->getString('status'));
+        $currentStatus = (string) $order->getStatus();
 
-        if (!in_array($newStatus, self::ALLOWED_STATUSES, true)) {
-            $this->addFlash('danger', 'Invalid order status.');
+        if ($newStatus === $currentStatus) {
+            $this->addFlash('info', 'Order is already in ' . $newStatus . ' status.');
+
+            return $this->redirectToRoute('manage_orders_show', [
+                'id' => $order->getId(),
+            ]);
+        }
+
+        if (!$order->canTransitionTo($newStatus)) {
+            $this->addFlash(
+                'danger',
+                sprintf(
+                    'Cannot change order status from "%s" to "%s". Order progression is strictly one-way and cannot be reverted or skipped.',
+                    $currentStatus,
+                    $newStatus
+                )
+            );
 
             return $this->redirectToRoute('manage_orders_show', [
                 'id' => $order->getId(),
@@ -98,7 +133,7 @@ final class OrderManagementController extends AbstractController
 
         $this->addFlash(
             'success',
-            'Order status updated successfully!'
+            sprintf('Order status updated from "%s" to "%s" successfully!', $currentStatus, $newStatus)
         );
 
         return $this->redirectToRoute('manage_orders_show', [

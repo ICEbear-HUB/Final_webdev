@@ -6,11 +6,13 @@ use App\Entity\Category;
 use App\Entity\Product;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
@@ -76,12 +78,34 @@ class ProductType extends AbstractType
                 ],
             ])
 
-            // IMAGE
-            ->add('image', TextType::class, [
-                'label' => 'Product Image Filename or Path',
+            // IMAGE FILE UPLOAD
+            ->add('imageFile', FileType::class, [
+                'label' => 'Import Product Image',
+                'mapped' => false,
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'Example: aceplus-original.png',
+                    'accept' => 'image/png,image/jpeg,image/webp,image/svg+xml',
+                ],
+                'constraints' => [
+                    new File(
+                        maxSize: '5M',
+                        mimeTypes: [
+                            'image/jpeg',
+                            'image/png',
+                            'image/webp',
+                            'image/svg+xml',
+                        ],
+                        mimeTypesMessage: 'Please upload a valid image file (JPEG, PNG, WEBP, or SVG).'
+                    ),
+                ],
+            ])
+
+            // EXISTING / CUSTOM PATH IMAGE (FALLBACK)
+            ->add('image', TextType::class, [
+                'label' => 'Or Image Path / Filename',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Optional: aceplus-original.png or images/Original.svg',
                 ],
             ])
 

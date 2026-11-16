@@ -117,6 +117,20 @@ final class CheckoutController extends AbstractController
                 $request->request->getString('phone')
             );
 
+            $paymentMethod = trim(
+                $request->request->getString('paymentMethod')
+            );
+
+            $validPaymentMethods = [
+                'Cash on Delivery (COD)',
+                'GCash',
+                'Maya',
+            ];
+
+            if (!in_array($paymentMethod, $validPaymentMethods, true)) {
+                $paymentMethod = 'Cash on Delivery (COD)';
+            }
+
             if ($address === '' || $phone === '') {
                 $this->addFlash(
                     'danger',
@@ -147,6 +161,7 @@ final class CheckoutController extends AbstractController
                 );
 
                 $order->setStatus('Pending');
+                $order->setPaymentMethod($paymentMethod);
                 $order->setDeliveryAddress($address);
                 $order->setPhone($phone);
                 $order->setCreatedAt(new \DateTimeImmutable());

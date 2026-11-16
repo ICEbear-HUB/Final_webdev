@@ -6,172 +6,568 @@
 {% block body %}
 
 <style>
-    .home-page {
-        background: #111827;
-        color: #f9fafb;
-        min-height: 100vh;
+    :root {
+        --ace-green: #80ff00;
+        --ace-dark: #111d2c;
+        --ace-darker: #0b141e;
+        --ace-white: #ffffff;
+        --ace-gray: #cbd5e1;
     }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    .home-page {
+        background: var(--ace-dark);
+        color: var(--ace-white);
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    /* =========================
+       NAVIGATION
+    ========================= */
 
     .navbar-aceplus {
-        background: #0b1220;
-        border-bottom: 1px solid #374151;
-        padding: 18px 6%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1050;
+        background: rgba(11, 20, 30, 0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        padding: 10px 6%;
+        transition: all .3s ease;
     }
 
-    .brand-name {
-        color: #a3e635;
-        font-size: 25px;
-        font-weight: 900;
-        text-decoration: none;
+    .brand-logo {
+        width: 55px;
+        height: 55px;
+        object-fit: contain;
     }
 
     .navbar-aceplus .nav-link {
-        color: #d1d5db;
+        color: #ffffff;
         margin-left: 18px;
-        font-weight: 600;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        transition: .3s;
     }
 
     .navbar-aceplus .nav-link:hover {
-        color: #a3e635;
+        color: var(--ace-green);
     }
 
+    .nav-login {
+        background: var(--ace-green);
+        color: #000 !important;
+        padding: 10px 22px !important;
+        border-radius: 5px;
+        font-weight: 900 !important;
+    }
+
+    .nav-login:hover {
+        background: #ffffff;
+        color: #000 !important;
+    }
+
+    /* =========================
+       HERO SECTION
+    ========================= */
+
     .hero-section {
-        padding: 100px 7%;
-        background: linear-gradient(135deg, #111827, #273449);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 130px 6% 70px;
+
+        background-image:
+            linear-gradient(
+                90deg,
+                rgba(0,0,0,0.65),
+                rgba(0,0,0,0.10)
+            ),
+            url("{{ asset('images/First page bg.svg') }}");
+
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-subtitle {
+        color: var(--ace-green);
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
     }
 
     .hero-title {
-        font-size: clamp(40px, 6vw, 68px);
-        font-weight: 900;
-        line-height: 1.1;
+        font-size: clamp(42px, 5vw, 72px);
+        font-weight: 1000;
+        line-height: 1.08;
+        text-transform: uppercase;
+        margin-top: 15px;
     }
 
     .hero-title span {
-        color: #a3e635;
+        color: var(--ace-green);
     }
 
     .hero-description {
-        color: #9ca3af;
-        font-size: 18px;
-        max-width: 550px;
+        color: #ffffff;
+        font-size: 17px;
+        max-width: 530px;
         line-height: 1.7;
     }
 
     .btn-aceplus {
-        background: #a3e635;
-        color: #111827;
-        border: none;
-        font-weight: 800;
-        padding: 13px 25px;
-        border-radius: 8px;
-        text-decoration: none;
         display: inline-block;
+        background: var(--ace-green);
+        color: #000000;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: 900;
+        text-decoration: none;
+        text-transform: uppercase;
+        transition: .3s;
     }
 
     .btn-aceplus:hover {
-        background: #84cc16;
-        color: #111827;
+        background: #ffffff;
+        color: #000000;
+        transform: translateY(-3px);
     }
 
-    .products-section {
-        padding: 75px 6%;
+    .hero-product {
+        width: 100%;
+        max-width: 540px;
+        height: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 15px 35px rgba(0,255,100,.25));
     }
 
-    .section-title {
-        font-size: 34px;
+    /* =========================
+       THE LATEST SECTION
+    ========================= */
+
+    .latest-section {
+        min-height: 340px;
+        padding: 65px 6% 35px;
+        background: #009b4b;
+        position: relative;
+        text-align: center;
+        border-bottom: 8px solid var(--ace-green);
+    }
+
+    .latest-title {
+        font-size: 30px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+    }
+
+    .latest-flavor-image {
+        width: 100%;
+        max-width: 190px;
+        height: 180px;
+        object-fit: contain;
+        transition: .3s;
+    }
+
+    .latest-flavor-image:hover {
+        transform: translateY(-8px);
+    }
+
+    .latest-center {
+        background: var(--ace-dark);
+        border: 2px solid var(--ace-green);
+        border-radius: 20px;
+        padding: 22px 15px;
+        max-width: 250px;
+        margin: 25px auto;
+    }
+
+    .latest-center h5 {
+        background: var(--ace-green);
+        color: #000;
+        padding: 8px;
+        font-size: 14px;
         font-weight: 900;
     }
 
+    .latest-center p {
+        margin: 10px 0 0;
+        font-weight: 900;
+    }
+
+    .latest-center span {
+        color: var(--ace-green);
+    }
+
+    /* =========================
+       PRODUCTS SECTION
+    ========================= */
+
+    .products-section {
+        padding: 75px 6% 100px;
+        background: var(--ace-dark);
+    }
+
+    .products-heading {
+        margin-bottom: 45px;
+    }
+
+    .section-title {
+        font-size: 36px;
+        font-weight: 1000;
+        text-transform: uppercase;
+    }
+
     .section-title span {
-        color: #a3e635;
+        color: var(--ace-green);
+    }
+
+    .products-intro {
+        color: var(--ace-gray);
     }
 
     .product-card {
-        background: #1f2937;
-        border: 1px solid #374151;
-        border-radius: 14px;
-        overflow: hidden;
+        background: transparent;
+        border: none;
+        text-align: center;
         height: 100%;
-        transition: transform .2s ease;
+        transition: .3s;
     }
 
     .product-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-8px);
+    }
+
+    .product-image-container {
+        background: #05090b;
+        border: 7px solid #05090b;
+        border-radius: 23px;
+        overflow: hidden;
+        max-width: 200px;
+        margin: 0 auto 15px;
+        height: 200px;
     }
 
     .product-image {
         width: 100%;
-        height: 230px;
-        object-fit: cover;
+        height: 100%;
+        object-fit: contain;
+        padding: 10px;
     }
 
     .product-placeholder {
-        height: 230px;
-        background: #273449;
+        width: 100%;
+        height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
+        background: #192a32;
     }
 
     .product-placeholder i {
         font-size: 65px;
-        color: #a3e635;
+        color: var(--ace-green);
     }
 
     .product-info {
-        padding: 22px;
+        padding: 0 10px;
     }
 
     .product-name {
-        font-weight: 800;
-        font-size: 19px;
-    }
-
-    .product-price {
-        color: #a3e635;
-        font-size: 21px;
-        font-weight: 900;
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        min-height: 44px;
     }
 
     .product-description {
-        color: #9ca3af;
-        min-height: 45px;
+        color: var(--ace-gray);
+        font-size: 13px;
+        min-height: 40px;
+    }
+
+    .product-price {
+        display: inline-block;
+        background: var(--ace-green);
+        color: #000000;
+        padding: 6px 25px;
+        border-radius: 25px;
+        font-weight: 900;
+        margin: 5px 0;
+    }
+
+    .product-stock {
+        color: var(--ace-green);
+        font-size: 13px;
+        margin: 7px 0;
     }
 
     .btn-view-product {
-        display: block;
-        text-align: center;
-        background: #a3e635;
-        color: #111827;
+        display: inline-block;
+        background: var(--ace-green);
+        color: #000000;
+        padding: 10px 22px;
+        border-radius: 5px;
+        font-weight: 900;
         text-decoration: none;
-        padding: 11px;
-        border-radius: 8px;
-        font-weight: 800;
-        margin-top: 15px;
+        transition: .3s;
     }
 
     .btn-view-product:hover {
-        background: #84cc16;
-        color: #111827;
+        background: #ffffff;
+        color: #000000;
     }
 
+    .out-of-stock {
+        color: #ff7777;
+    }
+
+    /* =========================
+       BENEFITS SECTION
+    ========================= */
+
+    .benefits-section {
+        background: var(--ace-dark);
+        padding: 85px 6% 100px;
+    }
+
+    .benefits-title {
+        font-size: 45px;
+        font-weight: 1000;
+        color: var(--ace-green);
+        margin-bottom: 55px;
+        text-transform: uppercase;
+    }
+
+    .benefit-item {
+        height: 100%;
+        padding: 10px 5px;
+    }
+
+    .benefit-heading {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .benefit-icon {
+        width: 55px;
+        height: 55px;
+        object-fit: contain;
+    }
+
+    .benefit-heading h4 {
+        color: var(--ace-green);
+        font-size: 18px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    .benefit-item p {
+        color: var(--ace-gray);
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    /* =========================
+       ABOUT US SECTION
+    ========================= */
+
+    .about-section {
+        background: var(--ace-dark);
+        padding: 90px 8%;
+        text-align: center;
+    }
+
+    .about-title {
+        color: var(--ace-green);
+        font-size: 46px;
+        font-weight: 1000;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+    }
+
+    .about-description {
+        max-width: 800px;
+        margin: 0 auto 20px;
+        color: #ffffff;
+        font-size: 15px;
+        line-height: 1.9;
+    }
+
+    .about-tagline {
+        color: var(--ace-green);
+        font-size: 18px;
+        font-weight: 1000;
+        margin-top: 30px;
+    }
+
+    /* =========================
+       FOLLOW US BANNER
+    ========================= */
+
+    .follow-banner {
+        background: var(--ace-green);
+        color: #000000;
+        padding: 18px 10px;
+        text-align: center;
+    }
+
+    .follow-banner p {
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .follow-banner h2 {
+        font-size: 36px;
+        font-weight: 1000;
+        margin: 0;
+        text-transform: uppercase;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
     .site-footer {
-        background: #0b1220;
-        border-top: 1px solid #374151;
-        padding: 30px 6%;
-        color: #9ca3af;
+        background: var(--ace-dark);
+        padding: 35px 8% 15px;
+        color: #ffffff;
+    }
+
+    .footer-heading {
+        color: var(--ace-green);
+        font-size: 16px;
+        font-weight: 900;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+    }
+
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-links li {
+        margin-bottom: 12px;
+    }
+
+    .footer-links a {
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 14px;
+        transition: .3s;
+    }
+
+    .footer-links a:hover {
+        color: var(--ace-green);
+    }
+
+    .footer-contact p {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .footer-bottom {
+        background: #009b4b;
+        color: #ffffff;
+        text-align: center;
+        padding: 15px;
+        font-size: 12px;
+    }
+
+    /* =========================
+       RESPONSIVE DESIGN
+    ========================= */
+
+    @media (max-width: 991px) {
+        .navbar-aceplus {
+            position: fixed;
+            background: rgba(11, 20, 30, 0.98);
+        }
+
+        .navbar-aceplus .nav-link {
+            margin-left: 0;
+            padding: 10px;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding-top: 145px;
+        }
+
+        .hero-description {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-product {
+            max-width: 380px;
+        }
+
+        .benefit-item {
+            margin-bottom: 25px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: 42px;
+        }
+
+        .latest-title,
+        .section-title {
+            font-size: 27px;
+        }
+
+        .benefits-title,
+        .about-title {
+            font-size: 36px;
+        }
+
+        .product-image-container {
+            max-width: 220px;
+        }
     }
 </style>
 
 <div class="home-page">
 
-    {# NAVIGATION #}
+    {# =========================
+       NAVIGATION
+    ========================= #}
+
     <nav class="navbar navbar-expand-lg navbar-aceplus">
 
         <div class="container-fluid">
 
-            <a href="{{ path('app_home') }}" class="brand-name">
-                ACEPLUS
+            <a href="{{ path('app_home') }}" class="navbar-brand">
+                <img
+                    src="{{ asset('images/Logo.svg') }}"
+                    alt="ACE PLUS Logo"
+                    class="brand-logo"
+                >
             </a>
 
             <button
@@ -179,6 +575,9 @@
                 type="button"
                 data-bs-toggle="collapse"
                 data-bs-target="#aceplusNavbar"
+                aria-controls="aceplusNavbar"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
             >
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -200,6 +599,18 @@
                     </li>
 
                     <li class="nav-item">
+                        <a href="#latest" class="nav-link">
+                            The Latest
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="#benefits" class="nav-link">
+                            Benefits
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a href="{{ path('cart_index') }}" class="nav-link">
                             <i class="bi bi-cart"></i>
                             Cart
@@ -209,13 +620,23 @@
                     {% if app.user %}
 
                         <li class="nav-item">
-                            <span class="nav-link">
-                                Hello, {{ app.user.firstName }}
-                            </span>
+                            {% if 'ROLE_ADMIN' in app.user.roles %}
+                                <a href="{{ path('admin_profile') }}" class="nav-link text-warning fw-semibold" title="View Admin Profile">
+                                    <i class="bi bi-person-circle"></i> {{ app.user.firstName }} (Admin)
+                                </a>
+                            {% elseif 'ROLE_STAFF' in app.user.roles %}
+                                <a href="{{ path('staff_profile') }}" class="nav-link text-info fw-semibold" title="View Staff Profile">
+                                    <i class="bi bi-person-circle"></i> {{ app.user.firstName }} (Staff)
+                                </a>
+                            {% else %}
+                                <a href="{{ path('customer_profile') }}" class="nav-link text-light fw-semibold" title="View Profile">
+                                    <i class="bi bi-person-circle"></i> {{ app.user.firstName }}
+                                </a>
+                            {% endif %}
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ path('app_logout') }}" class="nav-link">
+                            <a href="{{ path('app_logout') }}" class="nav-link nav-login">
                                 Logout
                             </a>
                         </li>
@@ -223,14 +644,14 @@
                     {% else %}
 
                         <li class="nav-item">
-                            <a href="{{ path('app_login') }}" class="nav-link">
+                            <a href="{{ path('app_login') }}" class="nav-link nav-login">
                                 Login
                             </a>
                         </li>
 
                         <li class="nav-item">
                             <a href="{{ path('app_register') }}" class="nav-link">
-                                Register
+                                Sign Up
                             </a>
                         </li>
 
@@ -244,38 +665,41 @@
 
     </nav>
 
-    {# HERO SECTION #}
-    <section class="hero-section">
+    {# =========================
+       HERO SECTION
+    ========================= #}
+
+    <section class="hero-section" id="home">
 
         <div class="container-fluid">
 
             <div class="row align-items-center">
 
-                <div class="col-lg-7">
+                <div class="col-lg-6 hero-content">
+
+                    <p class="hero-subtitle">
+                        THE NEW ERA OF ENERGY DRINK IS HERE
+                    </p>
 
                     <h1 class="hero-title">
-                        ENERGY THAT
-                        <span>MOVES YOU.</span>
+                        MEET THE NEW
+                        <br>
+                        LIFE <span>BOOST</span>
                     </h1>
 
                     <p class="hero-description mt-4">
-                        Discover Aceplus Energy Drink. Refresh your energy,
-                        stay focused, and keep moving toward your goals.
+                        Fuel your passion. Unleash your potential.
+                        ACEPLUS gives you the boost you need to take
+                        on every challenge, stay focused, and keep
+                        moving forward. Whether you're chasing goals,
+                        pushing your limits, or conquering your day,
+                        power through every moment with ACEPLUS.
                     </p>
 
                     <a href="#products" class="btn-aceplus mt-3">
-                        Explore Products
+                        EXPLORE NOW
                         <i class="bi bi-arrow-right"></i>
                     </a>
-
-                </div>
-
-                <div class="col-lg-5 text-center mt-5 mt-lg-0">
-
-                    <i
-                        class="bi bi-lightning-charge-fill"
-                        style="font-size: 190px; color: #a3e635;"
-                    ></i>
 
                 </div>
 
@@ -285,24 +709,82 @@
 
     </section>
 
-    {# PRODUCT SECTION #}
+    {# =========================
+       THE LATEST SECTION
+    ========================= #}
+
+    <section class="latest-section" id="latest">
+
+        <div class="container-fluid">
+
+            <h2 class="latest-title">
+                WHAT'S NEW WITH ACE
+            </h2>
+
+            <div class="row align-items-center justify-content-center">
+
+                <div class="col-6 col-md-4 text-center">
+
+                    <img
+                        src="{{ asset('images/whats-new-orange.png') }}"
+                        alt="ACE PLUS Orange Flavor"
+                        class="latest-flavor-image"
+                    >
+
+                </div>
+
+                <div class="col-12 col-md-4 order-first order-md-0">
+
+                    <div class="latest-center">
+
+                        <h5>NEW FLAVORS!!!</h5>
+
+                        <p>
+                            <span style="color:#ff9d00;">Plus</span>
+                            <span>Ultra</span>
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-6 col-md-4 text-center">
+
+                    <img
+                        src="{{ asset('images/whats-new-apple.png') }}"
+                        alt="ACE PLUS Apple Flavor"
+                        class="latest-flavor-image"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    {# =========================
+       PRODUCTS SECTION
+    ========================= #}
+
     <section class="products-section" id="products">
 
         <div class="container-fluid">
 
-            <div class="text-center mb-5">
+            <div class="products-heading">
 
                 <h2 class="section-title">
-                    OUR <span>PRODUCTS</span>
+                    EXPLORE THE <span>LINEUP</span>
                 </h2>
 
-                <p class="text-secondary">
-                    Discover the Aceplus collection.
-                </p>
+                <a href="#products" class="btn-aceplus mt-2">
+                    ORDER NOW
+                </a>
 
             </div>
 
-            <div class="row g-4">
+            <div class="row g-5">
 
                 {% for product in products %}
 
@@ -310,21 +792,30 @@
 
                         <div class="product-card">
 
-                            {% if product.image %}
+                            <div class="product-image-container">
 
-                                <img
-                                    src="{{ asset(product.image) }}"
-                                    alt="{{ product.Name }}"
-                                    class="product-image"
-                                >
+                                {% if product.image %}
 
-                            {% else %}
+                                    {% set imgPath = product.image %}
+                                    {% if not (imgPath starts with 'uploads/') and not (imgPath starts with 'images/') and not (imgPath starts with 'http') %}
+                                        {% set imgPath = 'images/' ~ imgPath %}
+                                    {% endif %}
 
-                                <div class="product-placeholder">
-                                    <i class="bi bi-cup-straw"></i>
-                                </div>
+                                    <img
+                                        src="{{ asset(imgPath) }}"
+                                        alt="{{ product.Name }}"
+                                        class="product-image"
+                                    >
 
-                            {% endif %}
+                                {% else %}
+
+                                    <div class="product-placeholder">
+                                        <i class="bi bi-cup-straw"></i>
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
 
                             <div class="product-info">
 
@@ -343,19 +834,25 @@
                                     ₱{{ product.price|number_format(2, '.', ',') }}
                                 </div>
 
-                                <p class="small text-secondary mt-2">
-                                    {% if product.stock > 0 %}
-                                        {{ product.stock }} available
-                                    {% else %}
+                                {% if product.stock > 0 %}
+
+                                    <p class="product-stock">
+                                        {{ product.stock }} in stock
+                                    </p>
+
+                                {% else %}
+
+                                    <p class="product-stock out-of-stock">
                                         Out of stock
-                                    {% endif %}
-                                </p>
+                                    </p>
+
+                                {% endif %}
 
                                 <a
                                     href="{{ path('customer_product_show', {id: product.id}) }}"
                                     class="btn-view-product"
                                 >
-                                    View Product
+                                    BUY
                                     <i class="bi bi-arrow-right"></i>
                                 </a>
 
@@ -389,26 +886,289 @@
 
     </section>
 
-    {# FOOTER #}
-    <footer class="site-footer">
+    {# =========================
+       BENEFITS SECTION
+    ========================= #}
 
-        <div class="container-fluid text-center">
+    <section class="benefits-section" id="benefits">
 
-            <h5 class="brand-name mb-3">
-                ACEPLUS
-            </h5>
+        <div class="container-fluid">
 
-            <p>
-                ENERGY THAT MOVES YOU.
+            <h2 class="benefits-title">
+                BENEFITS
+            </h2>
+
+            <div class="row g-4">
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="benefit-item">
+
+                        <div class="benefit-heading">
+
+                            <img
+                                src="{{ asset('icons/iconenergy.svg') }}"
+                                alt="Energy Icon"
+                                class="benefit-icon"
+                            >
+
+                            <h4>ENERGY BOOST</h4>
+
+                        </div>
+
+                        <p>
+                            Get ready to power through your day.
+                            ACEPLUS brings an energizing experience
+                            to help you stay active and ready for
+                            whatever challenges come your way.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="benefit-item">
+
+                        <div class="benefit-heading">
+
+                            <img
+                                src="{{ asset('icons/iconPerformance.svg') }}"
+                                alt="Performance Icon"
+                                class="benefit-icon"
+                            >
+
+                            <h4>PERFORMANCE</h4>
+
+                        </div>
+
+                        <p>
+                            Push beyond your limits and take on
+                            every challenge. Make every moment count
+                            with an energy drink designed to
+                            complement your active lifestyle.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="benefit-item">
+
+                        <div class="benefit-heading">
+
+                            <img
+                                src="{{ asset('icons/iconbattery.svg') }}"
+                                alt="Endurance Icon"
+                                class="benefit-icon"
+                            >
+
+                            <h4>ENDURANCE</h4>
+
+                        </div>
+
+                        <p>
+                            Keep moving and stay energized throughout
+                            your busy day. ACEPLUS is your companion
+                            for long days, demanding activities,
+                            and exciting adventures.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="benefit-item">
+
+                        <div class="benefit-heading">
+
+                            <img
+                                src="{{ asset('icons/iconfocus.svg') }}"
+                                alt="Focus Icon"
+                                class="benefit-icon"
+                            >
+
+                            <h4>BETTER FOCUS</h4>
+
+                        </div>
+
+                        <p>
+                            Stay on track with your goals. Whether
+                            you're studying, working, or enjoying
+                            your favorite activities, make every
+                            moment count with ACEPLUS.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    {# =========================
+       ABOUT US SECTION
+    ========================= #}
+
+    <section class="about-section" id="about">
+
+        <div class="container">
+
+            <h2 class="about-title">
+                ABOUT US
+            </h2>
+
+            <p class="about-description">
+                ACEPLUS is a modern energy drink brand built for
+                individuals who dare to dream, push boundaries,
+                and strive for more. We believe that every great
+                achievement starts with determination and the
+                courage to take on new challenges.
             </p>
 
-            <small>
-                &copy; {{ "now"|date("Y") }} Aceplus. All rights reserved.
-            </small>
+            <p class="about-description">
+                Our brand represents energy, ambition, and confidence.
+                Whether you're studying, working, gaming, or pursuing
+                your passions, ACEPLUS is here to be part of your journey.
+            </p>
+
+            <h4 class="about-tagline">
+                ACEPLUS — FUEL YOUR AMBITION. OWN YOUR ENERGY.
+            </h4>
+
+        </div>
+
+    </section>
+
+    {# =========================
+       FOLLOW US BANNER
+    ========================= #}
+
+    <section class="follow-banner">
+
+        <p>@ACEPLUS</p>
+
+        <h2>FOLLOW US</h2>
+
+    </section>
+
+    {# =========================
+       FOOTER
+    ========================= #}
+
+    <footer class="site-footer">
+
+        <div class="container-fluid">
+
+            <div class="row g-4">
+
+                <div class="col-md-4">
+
+                    <h5 class="footer-heading">
+                        FOLLOW US
+                    </h5>
+
+                    <ul class="footer-links">
+
+                        <li>
+                            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">
+                                Facebook
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
+                                YouTube
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="https://www.x.com/" target="_blank" rel="noopener noreferrer">
+                                X
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer">
+                                TikTok
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <h5 class="footer-heading">
+                        SUPPORT
+                    </h5>
+
+                    <ul class="footer-links">
+
+                        <li>
+                            <a href="#">
+                                Terms of Use
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#">
+                                Privacy Policy
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <h5 class="footer-heading">
+                        CONTACT US
+                    </h5>
+
+                    <div class="footer-contact">
+
+                        <p>
+                            <i class="bi bi-geo-alt-fill text-success"></i>
+                            Valencia, Negros Oriental
+                        </p>
+
+                        <p>
+                            <i class="bi bi-envelope-fill text-success"></i>
+                            aceplus@gmail.com
+                        </p>
+
+                        <p>
+                            <i class="bi bi-telephone-fill text-success"></i>
+                            Contact ACEPLUS
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
     </footer>
+
+    <div class="footer-bottom">
+
+        &copy; {{ "now"|date("Y") }} ACE PLUS Energy Drink.
+        All Rights Reserved.
+
+    </div>
 
 </div>
 

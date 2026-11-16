@@ -84,6 +84,11 @@
     </p>
 
     <p>
+        Payment Method:
+        <strong>{{ order.paymentMethod|default('Cash on Delivery (COD)') }}</strong>
+    </p>
+
+    <p>
         Delivery Address:
         {{ order.deliveryAddress }}
     </p>

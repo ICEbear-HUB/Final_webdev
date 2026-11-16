@@ -1,57 +1,87 @@
-
 {% extends 'base.html.twig' %}
 
-{% block title %}Login | Aceplus{% endblock %}
+{% block title %}Sign In | Aceplus{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
+<div class="auth-page d-flex align-items-center justify-content-center min-vh-100 py-5">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card shadow p-4">
+            <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4">
 
-                    <h1 class="h3 mb-4 text-center">Aceplus Login</h1>
+                <div class="text-center mb-4">
+                    <a href="{{ path('app_home') }}" class="d-inline-block text-decoration-none mb-3">
+                        <img src="{{ asset('images/Logo.svg') }}" alt="Aceplus Logo" style="width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 0 16px rgba(163,230,53,0.45));">
+                    </a>
+                    <h1 class="h3 fw-bold text-white mb-1">Welcome Back</h1>
+                    <p class="text-muted small">Sign in to your Aceplus account</p>
+                </div>
+
+                <div class="card shadow-lg p-4 p-sm-5" style="background: rgba(17, 24, 39, 0.95); border: 1px solid #374151; border-radius: 16px; backdrop-filter: blur(12px);">
 
                     {% if error %}
-                        <div class="alert alert-danger">
+                        <div class="alert alert-danger py-2 small mb-4">
+                            <i class="bi bi-exclamation-circle-fill me-2"></i>
                             {{ error.messageKey|trans(error.messageData, 'security') }}
                         </div>
                     {% endif %}
 
                     {% if app.user %}
-                        <div class="mb-3">
-                            You are logged in as {{ app.user.userIdentifier }},
-                            <a href="{{ logout_path() }}">Logout</a>
+                        <div class="alert alert-info py-2 small mb-4 text-center">
+                            You are logged in as <strong>{{ app.user.userIdentifier }}</strong>.
+                            <div class="mt-2">
+                                <a href="{{ logout_path() }}" class="btn btn-sm btn-outline-danger">Log Out</a>
+                            </div>
                         </div>
                     {% endif %}
 
                     <form method="post">
-
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input
-                                type="email"
-                                value="{{ last_username }}"
-                                name="_username"
-                                id="email"
-                                class="form-control"
-                                placeholder="Enter your email"
-                                autocomplete="email"
-                                required
-                                autofocus
-                            >
+                            <label for="email" class="form-label small fw-semibold text-light">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-muted">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                <input
+                                    type="email"
+                                    value="{{ last_username }}"
+                                    name="_username"
+                                    id="email"
+                                    class="form-control bg-dark border-secondary text-white"
+                                    placeholder="name@example.com"
+                                    autocomplete="email"
+                                    required
+                                    autofocus
+                                    style="padding: 11px;"
+                                >
+                            </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input
-                                type="password"
-                                name="_password"
-                                id="password"
-                                class="form-control"
-                                placeholder="Enter your password"
-                                autocomplete="current-password"
-                                required
-                            >
+                            <label for="password" class="form-label small fw-semibold text-light">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-muted">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input
+                                    type="password"
+                                    name="_password"
+                                    id="password"
+                                    class="form-control bg-dark border-secondary text-white"
+                                    placeholder="••••••••"
+                                    autocomplete="current-password"
+                                    required
+                                    style="padding: 11px;"
+                                >
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary border-secondary bg-dark text-muted"
+                                    data-toggle-password="#password"
+                                    aria-label="Show password"
+                                    title="Show password"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <input
@@ -60,14 +90,29 @@
                             value="{{ csrf_token('authenticate') }}"
                         >
 
-                        <button class="btn btn-primary w-100" type="submit">
-                            Sign In
+                        <button
+                            class="btn w-100 fw-bold mt-3 py-2"
+                            type="submit"
+                            style="background: var(--primary); color: #0b1220; border-radius: 8px; font-size: 15px; letter-spacing: 0.5px;"
+                        >
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
                         </button>
-
                     </form>
 
+                    <div class="text-center mt-4 pt-3 border-top border-secondary">
+                        <p class="text-muted small mb-2">
+                            Don't have an account yet?
+                            <a href="{{ path('app_register') }}" style="color: var(--primary); font-weight: 600;">Create Account</a>
+                        </p>
+                        <a href="{{ path('app_home') }}" class="text-muted small text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> Return to Homepage
+                        </a>
+                    </div>
+
                 </div>
+
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

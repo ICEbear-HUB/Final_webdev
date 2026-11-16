@@ -1,88 +1,129 @@
-
 {% extends 'base.html.twig' %}
 
-{% block title %}My Profile | Aceplus{% endblock %}
+{% block title %}My Profile | Aceplus Staff{% endblock %}
 
 {% block body %}
-
 <div class="admin-layout">
 
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2>Aceplus</h2>
-            <p>Staff Panel</p>
-        </div>
-
-        <nav>
-            <ul>
-                <li>
-                    <a href="{{ path('app_staff') }}">Dashboard</a>
-                </li>
-                <li>
-                    <a href="{{ path('staff_products') }}">Products</a>
-                </li>
-                <li>
-                    <a href="{{ path('staff_profile') }}">My Profile</a>
-                </li>
-                <li>
-                    <a href="{{ path('app_logout') }}">Logout</a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
+    {% include 'partials/staff_sidebar.html.twig' %}
 
     <main class="main-content">
 
-        <div class="page-header">
-            <h1>My Profile</h1>
-            <p>View and update your personal information.</p>
+        <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h1 class="h3 fw-bold mb-1">Staff Profile</h1>
+                <p class="text-muted mb-0">View and update your personal information and staff credentials.</p>
+            </div>
+            <a href="{{ path('app_staff') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-speedometer2"></i> Back to Dashboard
+            </a>
         </div>
 
         {% for message in app.flashes('success') %}
-            <div class="alert alert-success">
-                {{ message }}
+            <div class="alert alert-success d-flex align-items-center gap-2 mb-4">
+                <i class="bi bi-check-circle-fill"></i>
+                <div>{{ message }}</div>
             </div>
         {% endfor %}
 
-        <div class="card p-4">
+        {% for message in app.flashes('danger') %}
+            <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
 
-            <h3>Account Information</h3>
+        <div class="row g-4">
+            {# STAFF SUMMARY CARD #}
+            <div class="col-lg-4">
+                <div class="card shadow p-4 text-center h-100" style="background: var(--surface); border: 1px solid var(--border); border-radius: 14px;">
+                    <div class="mb-3">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 86px; height: 86px; background: rgba(13, 202, 240, 0.15); border: 2px solid #0dcaf0;">
+                            <i class="bi bi-person-badge-fill text-info" style="font-size: 42px;"></i>
+                        </div>
+                    </div>
 
-            <p>
-                <strong>Email:</strong>
-                {{ user.email }}
-            </p>
+                    <h4 class="fw-bold mb-1" style="color: var(--text);">{{ user.firstName }} {{ user.lastName }}</h4>
+                    <span class="badge mb-3 d-inline-block px-3 py-2" style="background: rgba(13, 202, 240, 0.15); color: #0dcaf0; font-size: 12px; border: 1px solid rgba(13, 202, 240, 0.4);">
+                        <i class="bi bi-person-workspace me-1"></i> Staff Member
+                    </span>
 
-            <p>
-                <strong>Account Role:</strong>
-                Staff
-            </p>
+                    <hr style="border-color: var(--border);">
 
-            <hr>
+                    <div class="text-start small">
+                        <div class="mb-2">
+                            <span class="text-muted d-block">Email Address</span>
+                            <span class="fw-semibold text-light">{{ user.email }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-muted d-block">Account Status</span>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                        <div>
+                            <span class="text-muted d-block">Permissions</span>
+                            <span class="text-light">Manage Products & Orders</span>
+                        </div>
+                    </div>
 
-            <h3>Edit Personal Information</h3>
+                    <div class="mt-4 pt-2">
+                        <a href="{{ path('staff_change_password') }}" class="btn btn-outline-warning w-100 btn-sm">
+                            <i class="bi bi-key-fill me-1"></i> Change Password
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-            {{ form_start(form) }}
+            {# EDIT STAFF PROFILE FORM #}
+            <div class="col-lg-8">
+                <div class="card shadow p-4" style="background: var(--surface); border: 1px solid var(--border); border-radius: 14px;">
+                    <h5 class="fw-bold mb-4" style="color: var(--primary);">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Personal Information
+                    </h5>
 
-                {{ form_row(form.firstName) }}
-                {{ form_row(form.lastName) }}
-                {{ form_row(form.phone) }}
-                {{ form_row(form.address) }}
+                    {{ form_start(form) }}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ form_label(form.firstName, 'First Name', {'label_attr': {'class': 'form-label text-muted small fw-semibold'}}) }}
+                                {{ form_widget(form.firstName, {'attr': {'class': 'form-control bg-dark border-secondary text-white'}}) }}
+                                {{ form_errors(form.firstName) }}
+                            </div>
 
-                <button type="submit" class="btn btn-primary">
-                    Save Changes
-                </button>
+                            <div class="col-md-6">
+                                {{ form_label(form.lastName, 'Last Name', {'label_attr': {'class': 'form-label text-muted small fw-semibold'}}) }}
+                                {{ form_widget(form.lastName, {'attr': {'class': 'form-control bg-dark border-secondary text-white'}}) }}
+                                {{ form_errors(form.lastName) }}
+                            </div>
 
-                <a href="{{ path('app_staff') }}" class="btn btn-secondary">
-                    Back to Dashboard
-                </a>
+                            <div class="col-12">
+                                {{ form_label(form.phone, 'Phone Number', {'label_attr': {'class': 'form-label text-muted small fw-semibold'}}) }}
+                                {{ form_widget(form.phone, {'attr': {'class': 'form-control bg-dark border-secondary text-white', 'placeholder': 'Optional phone number'}}) }}
+                                {{ form_errors(form.phone) }}
+                            </div>
 
-            {{ form_end(form) }}
+                            <div class="col-12">
+                                {{ form_label(form.address, 'Address', {'label_attr': {'class': 'form-label text-muted small fw-semibold'}}) }}
+                                {{ form_widget(form.address, {'attr': {'class': 'form-control bg-dark border-secondary text-white', 'rows': 3, 'placeholder': 'Optional address'}}) }}
+                                {{ form_errors(form.address) }}
+                            </div>
+                        </div>
 
+                        <div class="d-flex gap-2 mt-4 flex-wrap">
+                            <button type="submit" class="btn fw-bold px-4" style="background: var(--primary); color: #0b1220;">
+                                <i class="bi bi-check2-circle me-1"></i> Save Changes
+                            </button>
+                            <a href="{{ path('staff_change_password') }}" class="btn btn-outline-warning">
+                                <i class="bi bi-shield-lock me-1"></i> Change Password
+                            </a>
+                            <a href="{{ path('app_staff') }}" class="btn btn-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
         </div>
 
     </main>
 
 </div>
-
 {% endblock %}

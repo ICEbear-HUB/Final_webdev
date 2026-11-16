@@ -119,6 +119,83 @@
         margin-bottom: 20px;
     }
 
+    .payment-options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .payment-option-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        background: #111827;
+        border: 2px solid #374151;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .payment-option-card:hover {
+        border-color: #6b7280;
+    }
+
+    .payment-option-card.active {
+        border-color: #a3e635;
+        background: rgba(163, 230, 53, 0.08);
+    }
+
+    .payment-option-card input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        accent-color: #a3e635;
+        cursor: pointer;
+    }
+
+    .payment-option-info {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .payment-option-title {
+        font-weight: 700;
+        font-size: 15px;
+        color: #f9fafb;
+    }
+
+    .payment-option-desc {
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+    .payment-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-cod {
+        background: rgba(163, 230, 53, 0.2);
+        color: #a3e635;
+    }
+
+    .badge-gcash {
+        background: rgba(0, 122, 255, 0.2);
+        color: #38bdf8;
+    }
+
+    .badge-maya {
+        background: rgba(20, 184, 166, 0.2);
+        color: #2dd4bf;
+    }
+
     @media (max-width: 768px) {
         .checkout-grid {
             grid-template-columns: 1fr;
@@ -180,6 +257,64 @@
                     required
                 >
 
+                <label class="mb-2">Payment Method</label>
+
+                <div class="payment-options">
+
+                    <label class="payment-option-card active" for="pay_cod">
+                        <input
+                            type="radio"
+                            id="pay_cod"
+                            name="paymentMethod"
+                            value="Cash on Delivery (COD)"
+                            checked
+                            onchange="updatePaymentSelection(this)"
+                        >
+                        <div class="payment-option-info">
+                            <span class="payment-option-title">
+                                <i class="bi bi-cash-stack me-1"></i> Cash on Delivery (COD)
+                            </span>
+                            <span class="payment-option-desc">Pay with cash upon receipt of order</span>
+                        </div>
+                        <span class="payment-badge badge-cod">COD</span>
+                    </label>
+
+                    <label class="payment-option-card" for="pay_gcash">
+                        <input
+                            type="radio"
+                            id="pay_gcash"
+                            name="paymentMethod"
+                            value="GCash"
+                            onchange="updatePaymentSelection(this)"
+                        >
+                        <div class="payment-option-info">
+                            <span class="payment-option-title">
+                                <i class="bi bi-wallet2 me-1"></i> GCash
+                            </span>
+                            <span class="payment-option-desc">Pay seamlessly via your GCash e-wallet</span>
+                        </div>
+                        <span class="payment-badge badge-gcash">GCash</span>
+                    </label>
+
+                    <label class="payment-option-card" for="pay_maya">
+                        <input
+                            type="radio"
+                            id="pay_maya"
+                            name="paymentMethod"
+                            value="Maya"
+                            onchange="updatePaymentSelection(this)"
+                        >
+                        <div class="payment-option-info">
+                            <span class="payment-option-title">
+                                <i class="bi bi-credit-card-2-front me-1"></i> Maya
+                            </span>
+                            <span class="payment-option-desc">Pay via Maya app or linked Maya card</span>
+                        </div>
+                        <span class="payment-badge badge-maya">Maya</span>
+                    </label>
+
+                </div>
+
                 <button type="submit" class="place-order-btn">
                     Place Order
                 </button>
@@ -225,8 +360,8 @@
                 </span>
             </div>
 
-            <p class="checkout-muted" style="margin-top: 15px;">
-                Payment method: Cash on Delivery (COD)
+            <p class="checkout-muted" style="margin-top: 15px;" id="summaryPaymentMethod">
+                Payment method: <strong>Cash on Delivery (COD)</strong>
             </p>
 
         </div>
@@ -234,5 +369,18 @@
     </div>
 
 </div>
+
+<script>
+    function updatePaymentSelection(radio) {
+        document.querySelectorAll('.payment-option-card').forEach(card => card.classList.remove('active'));
+        if (radio.checked) {
+            radio.closest('.payment-option-card').classList.add('active');
+            const summaryMethod = document.getElementById('summaryPaymentMethod');
+            if (summaryMethod) {
+                summaryMethod.innerHTML = 'Payment method: <strong>' + radio.value + '</strong>';
+            }
+        }
+    }
+</script>
 
 {% endblock %}

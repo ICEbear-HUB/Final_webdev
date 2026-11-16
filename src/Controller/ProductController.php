@@ -8,9 +8,12 @@ use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/admin/products')]
 final class ProductController extends AbstractController
@@ -57,7 +60,8 @@ final class ProductController extends AbstractController
     #[Route('/new', name: 'admin_products_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        SluggerInterface $slugger
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -67,6 +71,25 @@ final class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile|null $imageFile */
+            $imageFile = $form->get('imageFile')->getData();
+
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                try {
+                    $imageFile->move(
+                        $this->getParameter('products_directory'),
+                        $newFilename
+                    );
+                    $product->setImage('uploads/products/' . $newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('danger', 'Failed to upload image file.');
+                }
+            }
+
             $product->setCreatedAt(new \DateTimeImmutable());
 
             $entityManager->persist($product);
@@ -99,7 +122,8 @@ final class ProductController extends AbstractController
     public function edit(
         Request $request,
         Product $product,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        SluggerInterface $slugger
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -107,6 +131,25 @@ final class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile|null $imageFile */
+            $imageFile = $form->get('imageFile')->getData();
+
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                try {
+                    $imageFile->move(
+                        $this->getParameter('products_directory'),
+                        $newFilename
+                    );
+                    $product->setImage('uploads/products/' . $newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('danger', 'Failed to upload image file.');
+                }
+            }
+
             $entityManager->flush();
 
             $this->addFlash('success', 'Product updated successfully.');

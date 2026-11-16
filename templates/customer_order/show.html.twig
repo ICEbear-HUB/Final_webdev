@@ -95,7 +95,7 @@
 
         <div class="detail-row">
             <span class="detail-label">Payment Method</span>
-            <strong>Cash on Delivery (COD)</strong>
+            <strong>{{ order.paymentMethod|default('Cash on Delivery (COD)') }}</strong>
         </div>
 
     </div>

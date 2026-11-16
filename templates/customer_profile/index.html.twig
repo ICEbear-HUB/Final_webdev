@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Profile | Aceplus{% endblock %}
+
+{% block body %}
+<div class="container py-5" style="max-width: 720px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-white mb-1">My Customer Profile</h1>
+            <p class="text-muted mb-0">View and update your personal information.</p>
+        </div>
+        <a href="{{ path('app_home') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to Store
+        </a>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    <div class="card bg-dark text-white border-secondary shadow p-4 mb-4">
+        <h4 class="h5 fw-bold mb-3" style="color: var(--primary);">Account Details</h4>
+        <div class="mb-3">
+            <label class="form-label text-muted small">Email Address</label>
+            <input type="text" class="form-control bg-secondary text-white border-0" value="{{ user.email }}" readonly disabled>
+        </div>
+
+        {{ form_start(form) }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.firstName, {'attr': {'class': 'form-control bg-dark text-white border-secondary'}}) }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.lastName, {'attr': {'class': 'form-control bg-dark text-white border-secondary'}}) }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                {{ form_row(form.phone, {'attr': {'class': 'form-control bg-dark text-white border-secondary'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_row(form.address, {'attr': {'class': 'form-control bg-dark text-white border-secondary', 'rows': 3}}) }}
+            </div>
+
+            <div class="d-flex gap-2 mt-3 flex-wrap">
+                <button type="submit" class="btn btn-primary fw-bold" style="background: var(--primary); border: none; color: #111;">
+                    <i class="bi bi-check-lg"></i> Update Profile
+                </button>
+                <a href="{{ path('customer_change_password') }}" class="btn btn-outline-warning">
+                    <i class="bi bi-shield-lock"></i> Change Password
+                </a>
+                <a href="{{ path('customer_orders_index') }}" class="btn btn-outline-info">
+                    <i class="bi bi-bag"></i> My Orders
+                </a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+
+</div>
+{% endblock %}

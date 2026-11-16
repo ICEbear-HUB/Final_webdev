@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class HomeController extends AbstractController
 {
+    #[Route('/', name: 'app_root')]
     #[Route('/home', name: 'app_home')]
     public function index(ProductRepository $productRepository): Response
     {

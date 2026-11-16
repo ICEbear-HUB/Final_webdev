@@ -49,9 +49,14 @@
         /* CUSTOMER NAVIGATION */
 
         .customer-navbar {
-            background: var(--sidebar);
+            background: rgba(11, 18, 32, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
-            padding: 14px 0;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
         }
 
         .customer-navbar .navbar-brand {
@@ -107,23 +112,41 @@
         }
 
         .sidebar-header {
-            margin-bottom: 40px;
+            margin-bottom: 35px;
             padding: 0 10px;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            margin-bottom: 6px;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 12px rgba(163, 230, 53, 0.35));
         }
 
         .sidebar-header h2 {
             color: var(--primary);
-            font-size: 27px;
+            font-size: 24px;
             font-weight: 800;
-            margin-bottom: 5px;
-            letter-spacing: -1px;
+            margin: 0;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
         }
 
         .sidebar-header p {
             color: var(--muted);
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 2px;
+            margin: 0;
+            padding-left: 2px;
         }
 
         .sidebar nav ul {
@@ -150,6 +173,24 @@
         .sidebar a:hover {
             background: #263449;
             color: var(--primary);
+            transform: translateX(3px);
+        }
+
+        .sidebar a.btn-visit-home {
+            background: rgba(163, 230, 53, 0.12);
+            color: var(--primary);
+            border: 1px dashed var(--primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .sidebar a.btn-visit-home:hover {
+            background: var(--primary);
+            color: #0b1220;
+            border-style: solid;
             transform: translateX(3px);
         }
 
@@ -313,52 +354,112 @@
             color: var(--muted) !important;
         }
 
-        /* RESPONSIVE */
+        
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    /* Stack sidebar above the main content */
+    .admin-layout {
+        flex-direction: column;
+    }
 
-        @media (max-width: 768px) {
+    /* Mobile sidebar */
+    .sidebar {
+        width: 100%;
+        min-width: 0;
+        padding: 15px;
+        position: relative;
+    }
 
-            .admin-layout {
-                flex-direction: column;
-            }
+    .sidebar-header {
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-            .sidebar {
-                width: 100%;
-                min-width: 100%;
-                padding: 15px;
-            }
+    /* Horizontally scrollable navigation */
+    .sidebar nav {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 
-            .sidebar-header {
-                margin-bottom: 15px;
-            }
+    .sidebar nav ul {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+        width: max-content;
+        min-width: 100%;
+        padding: 0 0 8px;
+        margin: 0;
+    }
 
-            .sidebar nav ul {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 5px;
-            }
+    .sidebar li {
+        flex: 0 0 auto;
+        margin-bottom: 0;
+    }
 
-            .sidebar li {
-                margin-bottom: 0;
-            }
+    .sidebar a {
+        display: block;
+        white-space: nowrap;
+        padding: 10px 13px;
+        font-size: 13px;
+    }
 
-            .sidebar a {
-                padding: 9px 12px;
-                font-size: 12px;
-            }
+    /* Main content */
+    .admin-content,
+    .main-content {
+        width: 100%;
+        min-width: 0;
+        padding: 20px 15px;
+    }
 
-            .admin-content,
-            .main-content {
-                padding: 20px 15px;
-            }
+    /* Page headings */
+    .page-header h1 {
+        font-size: 23px;
+    }
 
-            .page-header h1 {
-                font-size: 23px;
-            }
+    /* Responsive tables */
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 
-            .table-responsive {
-                overflow-x: auto;
-            }
-        }
+    .table-responsive table {
+        min-width: 650px;
+    }
+
+    /* Prevent buttons from exceeding the screen */
+    .btn {
+        max-width: 100%;
+        white-space: normal;
+    }
+}
+
+/* Smaller mobile screens */
+@media (max-width: 480px) {
+    .sidebar {
+        padding: 12px;
+    }
+
+    .admin-content,
+    .main-content {
+        padding: 15px 10px;
+    }
+
+    .page-header h1 {
+        font-size: 20px;
+    }
+
+    .sidebar a {
+        font-size: 12px;
+        padding: 9px 11px;
+    }
+}
+
+        
 
     </style>
 
@@ -382,10 +483,21 @@
 
                 <div class="d-flex align-items-center gap-3">
 
+                    <a href="{{ path('customer_profile') }}"
+                       class="btn btn-outline-light btn-sm d-flex align-items-center gap-2">
+                        <i class="bi bi-person-circle text-primary"></i>
+                        <span>{{ app.user.firstName }}</span>
+                    </a>
+
                     <a href="{{ path('customer_orders_index') }}"
                        class="btn btn-orders btn-sm">
                         <i class="bi bi-bag"></i>
                         My Orders
+                    </a>
+
+                    <a href="{{ path('app_logout') }}"
+                       class="btn btn-outline-danger btn-sm" title="Logout">
+                        <i class="bi bi-box-arrow-right"></i>
                     </a>
 
                 </div>
@@ -398,6 +510,38 @@
 
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('click', function (event) {
+            const toggleBtn = event.target.closest('[data-toggle-password]');
+            if (!toggleBtn) return;
+
+            const targetSelector = toggleBtn.getAttribute('data-toggle-password');
+            const targetInput = targetSelector 
+                ? document.querySelector(targetSelector)
+                : toggleBtn.closest('.input-group')?.querySelector('input');
+
+            if (!targetInput) return;
+
+            const isPassword = targetInput.type === 'password';
+            targetInput.type = isPassword ? 'text' : 'password';
+
+            const icon = toggleBtn.querySelector('i');
+            if (icon) {
+                if (isPassword) {
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                } else {
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                }
+            }
+
+            const label = isPassword ? 'Hide password' : 'Show password';
+            toggleBtn.setAttribute('aria-label', label);
+            toggleBtn.setAttribute('title', label);
+        });
+    </script>
 
     {% block javascripts %}{% endblock %}
 

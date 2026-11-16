@@ -32,6 +32,9 @@ class Order
     #[ORM\Column(length: 20)]
     private ?string $phone = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $paymentMethod = 'Cash on Delivery (COD)';
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -82,6 +85,47 @@ class Order
         return $this;
     }
 
+    public const STATUS_PENDING = 'Pending';
+    public const STATUS_PROCESSING = 'Processing';
+    public const STATUS_COMPLETED = 'Completed';
+    public const STATUS_CANCELLED = 'Cancelled';
+
+    public const ALLOWED_STATUSES = [
+        self::STATUS_PENDING,
+        self::STATUS_PROCESSING,
+        self::STATUS_COMPLETED,
+        self::STATUS_CANCELLED,
+    ];
+
+    /**
+     * One-way status progression map:
+     * - Pending can progress to Processing or Cancelled.
+     * - Processing can progress to Completed or Cancelled.
+     * - Completed cannot transition to any other status (final).
+     * - Cancelled cannot transition to any other status (final).
+     */
+    public const ALLOWED_TRANSITIONS = [
+        self::STATUS_PENDING => [self::STATUS_PROCESSING, self::STATUS_CANCELLED],
+        self::STATUS_PROCESSING => [self::STATUS_COMPLETED, self::STATUS_CANCELLED],
+        self::STATUS_COMPLETED => [],
+        self::STATUS_CANCELLED => [],
+    ];
+
+    public function getNextAllowedStatuses(): array
+    {
+        return self::ALLOWED_TRANSITIONS[$this->status] ?? [];
+    }
+
+    public function canTransitionTo(string $targetStatus): bool
+    {
+        return in_array($targetStatus, $this->getNextAllowedStatuses(), true);
+    }
+
+    public function isFinalStatus(): bool
+    {
+        return empty($this->getNextAllowedStatuses());
+    }
+
     public function getStatus(): ?string
     {
         return $this->status;
@@ -114,6 +158,18 @@ class Order
     public function setPhone(string $phone): static
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getPaymentMethod(): ?string
+    {
+        return $this->paymentMethod;
+    }
+
+    public function setPaymentMethod(?string $paymentMethod): static
+    {
+        $this->paymentMethod = $paymentMethod;
 
         return $this;
     }

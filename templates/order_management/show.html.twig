@@ -8,11 +8,27 @@
 <div class="main-content">
 
     <div class="page-header">
-        <a href="{{ path('manage_orders_index') }}"
-           class="btn btn-secondary btn-sm mb-3">
-            <i class="bi bi-arrow-left"></i>
-            Back to Orders
-        </a>
+        <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+            <a href="{{ path('manage_orders_index') }}"
+               class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i>
+                Back to Orders
+            </a>
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_admin') }}"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-speedometer2"></i>
+                    Back to Dashboard
+                </a>
+            {% elseif is_granted('ROLE_STAFF') %}
+                <a href="{{ path('app_staff') }}"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-speedometer2"></i>
+                    Back to Dashboard
+                </a>
+            {% endif %}
+        </div>
 
         <h1>Order Details</h1>
         <p>Review customer information and update the order status.</p>
@@ -55,7 +71,7 @@
 
                     <div class="col-md-6">
                         <small class="text-muted">Payment Method</small>
-                        <h6>Cash on Delivery (COD)</h6>
+                        <h6>{{ order.paymentMethod|default('Cash on Delivery (COD)') }}</h6>
                     </div>
 
                 </div>
@@ -138,48 +154,100 @@
 
             <div class="card p-4">
 
-                <h5 class="mb-3">Order Status</h5>
+                <h5 class="mb-3">Order Status Progression</h5>
 
-                <p class="text-muted">
-                    Current Status:
-                    <strong>{{ order.status }}</strong>
-                </p>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-1">Current Status</small>
+                    {% if order.status == 'Pending' %}
+                        <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                            <i class="bi bi-clock-history me-1"></i> Pending
+                        </span>
+                    {% elseif order.status == 'Processing' %}
+                        <span class="badge bg-info text-dark fs-6 px-3 py-2">
+                            <i class="bi bi-arrow-repeat me-1"></i> Processing
+                        </span>
+                    {% elseif order.status == 'Completed' %}
+                        <span class="badge bg-success fs-6 px-3 py-2">
+                            <i class="bi bi-check-circle-fill me-1"></i> Completed
+                        </span>
+                    {% elseif order.status == 'Cancelled' %}
+                        <span class="badge bg-danger fs-6 px-3 py-2">
+                            <i class="bi bi-x-circle-fill me-1"></i> Cancelled
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary fs-6 px-3 py-2">
+                            {{ order.status }}
+                        </span>
+                    {% endif %}
+                </div>
 
-                <form method="POST"
-                      action="{{ path('manage_orders_update_status', {
-                          id: order.id
-                      }) }}">
+                {# ONE-WAY FLOW VISUALIZER #}
+                <div class="mb-4 p-3 rounded" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);">
+                    <small class="text-muted d-block fw-semibold mb-2">Workflow Progression:</small>
+                    <div class="d-flex align-items-center gap-2 flex-wrap small">
+                        <span class="badge {% if order.status == 'Pending' %}bg-warning text-dark{% elseif order.status in ['Processing', 'Completed'] %}bg-secondary text-light{% else %}bg-dark border border-secondary text-muted{% endif %}">
+                            1. Pending
+                        </span>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                        <span class="badge {% if order.status == 'Processing' %}bg-info text-dark{% elseif order.status == 'Completed' %}bg-secondary text-light{% else %}bg-dark border border-secondary text-muted{% endif %}">
+                            2. Processing
+                        </span>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                        <span class="badge {% if order.status == 'Completed' %}bg-success text-white{% else %}bg-dark border border-secondary text-muted{% endif %}">
+                            3. Completed
+                        </span>
+                    </div>
+                    {% if order.status == 'Cancelled' %}
+                        <div class="mt-2 text-danger small">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> This order was cancelled.
+                        </div>
+                    {% endif %}
+                </div>
 
-                    <input type="hidden"
-                           name="_token"
-                           value="{{ csrf_token('update-order-status-' ~ order.id) }}">
+                {% if order.isFinalStatus %}
+                    <div class="alert alert-secondary mb-0">
+                        <i class="bi bi-lock-fill me-1"></i>
+                        This order is marked as <strong>{{ order.status }}</strong> and cannot be modified further. Status changes are permanently locked.
+                    </div>
+                {% else %}
+                    <form method="POST"
+                          action="{{ path('manage_orders_update_status', {
+                              id: order.id
+                          }) }}">
 
-                    <label class="form-label" for="status">
-                        Update Status
-                    </label>
+                        <input type="hidden"
+                               name="_token"
+                               value="{{ csrf_token('update-order-status-' ~ order.id) }}">
 
-                    <select name="status"
-                            id="status"
-                            class="form-select mb-3"
-                            required>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="status">
+                                Advance Status to:
+                            </label>
 
-                        {% for status in statuses %}
+                            <select name="status"
+                                    id="status"
+                                    class="form-select"
+                                    required>
+                                <option value="" disabled selected>-- Select Next Status --</option>
+                                {% for nextStatus in nextStatuses %}
+                                    <option value="{{ nextStatus }}">
+                                        {{ nextStatus }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text text-muted">
+                                <i class="bi bi-shield-check text-info me-1"></i>
+                                One-way progression: reverting to previous statuses is disabled.
+                            </div>
+                        </div>
 
-                            <option value="{{ status }}"
-                                {% if order.status == status %}selected{% endif %}>
-                                {{ status }}
-                            </option>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">
+                            <i class="bi bi-arrow-right-circle me-1"></i>
+                            Update Status
+                        </button>
 
-                        {% endfor %}
-
-                    </select>
-
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-check-circle"></i>
-                        Update Order Status
-                    </button>
-
-                </form>
+                    </form>
+                {% endif %}
 
             </div>
 

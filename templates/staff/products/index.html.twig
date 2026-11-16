@@ -7,29 +7,7 @@
 
 <div class="admin-layout">
 
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2>Aceplus</h2>
-            <p>Staff Panel</p>
-        </div>
-
-        <nav>
-            <ul>
-                <li>
-                    <a href="{{ path('app_staff') }}">Dashboard</a>
-                </li>
-                <li>
-                    <a href="{{ path('staff_products') }}">Products</a>
-                </li>
-                <li>
-                    <a href="{{ path('staff_profile') }}">My Profile</a>
-                </li>
-                <li>
-                    <a href="{{ path('app_logout') }}">Logout</a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
+    {% include 'partials/staff_sidebar.html.twig' %}
 
     <main class="admin-content">
 

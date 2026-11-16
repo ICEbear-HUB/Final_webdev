@@ -7,48 +7,20 @@
 
 <div class="admin-layout">
 
-    <aside class="sidebar">
-
-        <div class="sidebar-header">
-            <h2>Aceplus</h2>
-            <p>Staff Panel</p>
-        </div>
-
-        <nav>
-            <ul>
-                <li>
-                    <a href="{{ path('app_staff') }}">Dashboard</a>
-                </li>
-
-                <li>
-                    <a href="{{ path('staff_products') }}">Products</a>
-                </li>
-
-                <li>
-                    <a href="{{ path('manage_orders_index') }}">
-                        Order Management
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ path('staff_profile') }}">My Profile</a>
-                </li>
-
-                <li>
-                    <a href="{{ path('app_logout') }}">Logout</a>
-                </li>
-            </ul>
-        </nav>
-
-    </aside>
+    {% include 'partials/staff_sidebar.html.twig' %}
 
     <main class="admin-content">
 
-        <h1>Welcome to Aceplus Staff Dashboard!</h1>
-
-        <p class="text-muted">
-            Manage your assigned tasks and monitor product inventory.
-        </p>
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <h1 class="mb-1">Welcome to Aceplus Staff Dashboard!</h1>
+                <p class="text-muted mb-0">Manage your assigned tasks and monitor product inventory.</p>
+            </div>
+            <a href="{{ path('staff_profile') }}" class="btn btn-outline-light d-flex align-items-center gap-2">
+                <i class="bi bi-person-circle text-info fs-5"></i>
+                <span class="fw-semibold">{{ app.user.firstName }} (Staff)</span>
+            </a>
+        </div>
 
         <div class="card shadow p-4 mt-4">
             <h4>Staff Portal</h4>

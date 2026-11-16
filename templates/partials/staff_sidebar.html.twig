@@ -1,0 +1,52 @@
+<aside class="sidebar">
+
+    <div class="sidebar-header">
+        <a href="{{ path('app_staff') }}" class="sidebar-brand">
+            <img src="{{ asset('images/Logo.svg') }}" alt="Aceplus Logo" class="sidebar-logo">
+            <h2>Aceplus</h2>
+        </a>
+        <p>Staff Panel</p>
+    </div>
+
+    <nav>
+        <ul>
+            <li>
+                <a href="{{ path('app_home') }}" class="btn-visit-home" target="_blank" rel="noopener noreferrer">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    <span>Visit Homepage</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ path('app_staff') }}">
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ path('staff_products') }}">
+                    Products
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ path('manage_orders_index') }}">
+                    Order Management
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ path('staff_profile') }}">
+                    My Profile
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ path('app_logout') }}">
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+</aside>

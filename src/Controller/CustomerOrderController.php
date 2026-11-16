@@ -39,7 +39,7 @@ final class CustomerOrderController extends AbstractController
             ['createdAt' => 'DESC']
         );
 
-        return $this->render('Customer_order/index.html.twig', [
+        return $this->render('customer_order/index.html.twig', [
             'orders' => $orders,
         ]);
     }
@@ -84,7 +84,7 @@ final class CustomerOrderController extends AbstractController
             );
         }
 
-        return $this->render('Customer_order/show.html.twig', [
+        return $this->render('customer_order/show.html.twig', [
             'order' => $order,
         ]);
     }

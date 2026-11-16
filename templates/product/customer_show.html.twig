@@ -120,8 +120,13 @@
 
                     {% if product.image %}
 
+                        {% set imgPath = product.image %}
+                        {% if not (imgPath starts with 'uploads/') and not (imgPath starts with 'images/') and not (imgPath starts with 'http') %}
+                            {% set imgPath = 'images/' ~ imgPath %}
+                        {% endif %}
+
                         <img
-                            src="{{ asset(product.image) }}"
+                            src="{{ asset(imgPath) }}"
                             alt="{{ product.Name }}"
                             class="product-image"
                         >

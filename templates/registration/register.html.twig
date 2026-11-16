@@ -1,65 +1,168 @@
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Create an Account | Aceplus{% endblock %}
 
 {% block body %}
-
-<div class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-
-            <div class="card shadow p-4">
+<div class="auth-page d-flex align-items-center justify-content-center min-vh-100 py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-11 col-sm-10 col-md-8 col-lg-6 col-xl-5">
 
                 <div class="text-center mb-4">
-                    <h1>Aceplus</h1>
-                    <h4>Create Your Account</h4>
-                    <p class="text-muted">
-                        Join Aceplus today!
-                    </p>
+                    <a href="{{ path('app_home') }}" class="d-inline-block text-decoration-none mb-3">
+                        <img src="{{ asset('images/Logo.svg') }}" alt="Aceplus Logo" style="width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 0 16px rgba(163,230,53,0.45));">
+                    </a>
+                    <h1 class="h3 fw-bold text-white mb-1">Join the ACEPLUS Movement</h1>
+                    <p class="text-muted small">Fuel your energy — create your free account today</p>
                 </div>
 
-                {% for message in app.flashes('success') %}
-                    <div class="alert alert-success">
-                        {{ message }}
+                <div class="card shadow-lg p-4 p-sm-5" style="background: rgba(17, 24, 39, 0.95); border: 1px solid #374151; border-radius: 16px; backdrop-filter: blur(12px);">
+
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success py-2 small mb-4">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    {{ form_errors(registrationForm) }}
+
+                    {{ form_start(registrationForm) }}
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                {{ form_label(registrationForm.firstName, 'First Name', {'label_attr': {'class': 'form-label small fw-semibold text-light'}}) }}
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary text-muted">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                    {{ form_widget(registrationForm.firstName, {
+                                        'attr': {
+                                            'class': 'form-control bg-dark border-secondary text-white',
+                                            'placeholder': 'First name'
+                                        }
+                                    }) }}
+                                </div>
+                                {{ form_errors(registrationForm.firstName) }}
+                            </div>
+
+                            <div class="col-sm-6">
+                                {{ form_label(registrationForm.lastName, 'Last Name', {'label_attr': {'class': 'form-label small fw-semibold text-light'}}) }}
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary text-muted">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                    {{ form_widget(registrationForm.lastName, {
+                                        'attr': {
+                                            'class': 'form-control bg-dark border-secondary text-white',
+                                            'placeholder': 'Last name'
+                                        }
+                                    }) }}
+                                </div>
+                                {{ form_errors(registrationForm.lastName) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.email, 'Email Address', {'label_attr': {'class': 'form-label small fw-semibold text-light'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-muted">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                {{ form_widget(registrationForm.email, {
+                                    'attr': {
+                                        'class': 'form-control bg-dark border-secondary text-white',
+                                        'placeholder': 'name@example.com'
+                                    }
+                                }) }}
+                            </div>
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.plainPassword.first, 'Password', {'label_attr': {'class': 'form-label small fw-semibold text-light'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-muted">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                {{ form_widget(registrationForm.plainPassword.first, {
+                                    'attr': {
+                                        'class': 'form-control bg-dark border-secondary text-white',
+                                        'placeholder': 'At least 8 characters'
+                                    }
+                                }) }}
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary border-secondary bg-dark text-muted"
+                                    data-toggle-password
+                                    aria-label="Show password"
+                                    title="Show password"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {{ form_errors(registrationForm.plainPassword.first) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.plainPassword.second, 'Confirm Password', {'label_attr': {'class': 'form-label small fw-semibold text-light'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-muted">
+                                    <i class="bi bi-shield-check"></i>
+                                </span>
+                                {{ form_widget(registrationForm.plainPassword.second, {
+                                    'attr': {
+                                        'class': 'form-control bg-dark border-secondary text-white',
+                                        'placeholder': 'Re-type password'
+                                    }
+                                }) }}
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary border-secondary bg-dark text-muted"
+                                    data-toggle-password
+                                    aria-label="Show password"
+                                    title="Show password"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {{ form_errors(registrationForm.plainPassword.second) }}
+                        </div>
+
+                        <div class="form-check mb-4 mt-3">
+                            {{ form_widget(registrationForm.agreeTerms, {
+                                'attr': {'class': 'form-check-input bg-dark border-secondary'}
+                            }) }}
+                            {{ form_label(registrationForm.agreeTerms, 'I agree to the Terms & Conditions', {
+                                'label_attr': {'class': 'form-check-label text-muted small'}
+                            }) }}
+                            {{ form_errors(registrationForm.agreeTerms) }}
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn w-100 fw-bold py-2"
+                            style="background: var(--primary); color: #0b1220; border-radius: 8px; font-size: 15px; letter-spacing: 0.5px;"
+                        >
+                            <i class="bi bi-person-plus-fill me-1"></i> Create Account
+                        </button>
+
+                    {{ form_end(registrationForm) }}
+
+                    <div class="text-center mt-4 pt-3 border-top border-secondary">
+                        <p class="text-muted small mb-2">
+                            Already have an account?
+                            <a href="{{ path('app_login') }}" style="color: var(--primary); font-weight: 600;">Sign In</a>
+                        </p>
+                        <a href="{{ path('app_home') }}" class="text-muted small text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> Return to Homepage
+                        </a>
                     </div>
-                {% endfor %}
 
-                {{ form_errors(registrationForm) }}
-
-                {{ form_start(registrationForm) }}
-
-                    {{ form_row(registrationForm.firstName) }}
-
-                    {{ form_row(registrationForm.lastName) }}
-
-                    {{ form_row(registrationForm.email) }}
-
-                    {{ form_row(registrationForm.plainPassword.first) }}
-
-                    {{ form_row(registrationForm.plainPassword.second) }}
-
-                    {{ form_row(registrationForm.agreeTerms) }}
-
-                    <button type="submit" class="btn btn-success w-100 mt-3">
-                        Create Account
-                    </button>
-
-                {{ form_end(registrationForm) }}
-
-                <hr>
-
-                <div class="text-center">
-                    <p>
-                        Already have an account?
-                        <a href="{{ path('app_login') }}">Sign In</a>
-                    </p>
                 </div>
 
             </div>
-
         </div>
     </div>
 </div>
-
 {% endblock %}

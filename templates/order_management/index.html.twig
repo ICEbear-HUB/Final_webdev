@@ -7,9 +7,23 @@
 
 <div class="main-content">
 
-    <div class="page-header">
-        <h1>Order Management</h1>
-        <p>View and manage all customer orders.</p>
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h1>Order Management</h1>
+            <p>View and manage all customer orders.</p>
+        </div>
+
+        <div>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_admin') }}" class="btn btn-secondary">
+                    <i class="bi bi-speedometer2"></i> Back to Dashboard
+                </a>
+            {% elseif is_granted('ROLE_STAFF') %}
+                <a href="{{ path('app_staff') }}" class="btn btn-secondary">
+                    <i class="bi bi-speedometer2"></i> Back to Dashboard
+                </a>
+            {% endif %}
+        </div>
     </div>
 
     {% for message in app.flashes('success') %}
@@ -22,12 +36,59 @@
 
     <div class="card p-4">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <h5 class="mb-0">Customer Orders</h5>
             <span class="badge bg-secondary">
-                {{ orders|length }} Orders
+                {{ orders|length }} Result{{ orders|length == 1 ? '' : 's' }}
             </span>
         </div>
+
+        {# STATUS FILTER TABS #}
+        <div class="d-flex gap-2 mb-3 flex-wrap align-items-center">
+            <span class="text-muted small me-1">Filter:</span>
+            <a href="{{ path('manage_orders_index', searchQuery ? {'q': searchQuery} : {}) }}"
+               class="btn btn-sm {% if selectedStatus == '' %}btn-light fw-bold{% else %}btn-outline-secondary{% endif %}">
+                All ({{ statusCounts['All'] }})
+            </a>
+            <a href="{{ path('manage_orders_index', {'status': 'Pending'}|merge(searchQuery ? {'q': searchQuery} : {})) }}"
+               class="btn btn-sm {% if selectedStatus == 'Pending' %}btn-warning text-dark fw-bold{% else %}btn-outline-warning{% endif %}">
+                Pending ({{ statusCounts['Pending'] }})
+            </a>
+            <a href="{{ path('manage_orders_index', {'status': 'Processing'}|merge(searchQuery ? {'q': searchQuery} : {})) }}"
+               class="btn btn-sm {% if selectedStatus == 'Processing' %}btn-info text-dark fw-bold{% else %}btn-outline-info{% endif %}">
+                Processing ({{ statusCounts['Processing'] }})
+            </a>
+            <a href="{{ path('manage_orders_index', {'status': 'Completed'}|merge(searchQuery ? {'q': searchQuery} : {})) }}"
+               class="btn btn-sm {% if selectedStatus == 'Completed' %}btn-success fw-bold{% else %}btn-outline-success{% endif %}">
+                Completed ({{ statusCounts['Completed'] }})
+            </a>
+            <a href="{{ path('manage_orders_index', {'status': 'Cancelled'}|merge(searchQuery ? {'q': searchQuery} : {})) }}"
+               class="btn btn-sm {% if selectedStatus == 'Cancelled' %}btn-danger fw-bold{% else %}btn-outline-danger{% endif %}">
+                Cancelled ({{ statusCounts['Cancelled'] }})
+            </a>
+        </div>
+
+        {# SEARCH FORM #}
+        <form method="GET" action="{{ path('manage_orders_index') }}" class="mb-4">
+            {% if selectedStatus %}
+                <input type="hidden" name="status" value="{{ selectedStatus }}">
+            {% endif %}
+            <div class="input-group">
+                <input type="text"
+                       name="q"
+                       value="{{ searchQuery }}"
+                       class="form-control"
+                       placeholder="Search by Order #, Customer email, or phone number...">
+                <button class="btn btn-outline-secondary" type="submit">
+                    <i class="bi bi-search"></i> Search
+                </button>
+                {% if searchQuery or selectedStatus %}
+                    <a href="{{ path('manage_orders_index') }}" class="btn btn-outline-danger" title="Clear filters">
+                        <i class="bi bi-x-circle"></i> Reset
+                    </a>
+                {% endif %}
+            </div>
+        </form>
 
         {% if orders is not empty %}
 

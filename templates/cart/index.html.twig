@@ -152,11 +152,16 @@
 
                                     {% if item.product.image %}
 
+                                        {% set itemImg = item.product.image %}
+                                        {% if not (itemImg starts with 'uploads/') and not (itemImg starts with 'images/') and not (itemImg starts with 'http') %}
+                                            {% set itemImg = 'images/' ~ itemImg %}
+                                        {% endif %}
+
                                         <img
-                                            src="{{ asset(item.product.image) }}"
+                                            src="{{ asset(itemImg) }}"
                                             alt="{{ item.product.Name }}"
                                             class="img-fluid rounded"
-                                            style="width: 100%; height: 130px; object-fit: cover;"
+                                            style="width: 100%; height: 130px; object-fit: contain; background: #05090b; padding: 6px;"
                                         >
 
                                     {% else %}
@@ -300,13 +305,26 @@
 
                         </div>
 
-                        <button class="btn btn-aceplus w-100 mt-4" disabled>
-                            Proceed to Checkout (Coming Soon)
-                        </button>
-
-                        <p class="text-secondary small text-center mt-3 mb-0">
-                            Checkout will be available in our next module.
-                        </p>
+                        {% if app.user %}
+                            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                                <div class="alert alert-warning small mt-4 mb-0">
+                                    <i class="bi bi-info-circle me-1"></i> Admin &amp; Staff accounts cannot place customer orders.
+                                </div>
+                            {% else %}
+                                <a href="{{ path('checkout_index') }}" class="btn btn-aceplus w-100 mt-4 d-flex justify-content-center align-items-center gap-2">
+                                    <span>Proceed to Checkout</span>
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="btn btn-aceplus w-100 mt-4 d-flex justify-content-center align-items-center gap-2">
+                                <span>Login to Checkout</span>
+                                <i class="bi bi-box-arrow-in-right"></i>
+                            </a>
+                            <p class="text-secondary small text-center mt-2 mb-0">
+                                Please sign in to complete your purchase.
+                            </p>
+                        {% endif %}
 
                     </div>
 
