@@ -1,0 +1,164 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Aceplus Stock Movement History{% endblock %}
+
+{% block body %}
+
+<div class="admin-layout">
+
+    {% include 'partials/sidebar.html.twig' %}
+
+    <main class="admin-content">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+            <div>
+                <h1 class="mb-1">Stock Movement History</h1>
+                <p class="text-muted mb-0">
+                    Track all inventory additions and removals.
+                </p>
+            </div>
+
+            <a href="{{ path('app_admin_inventory') }}"
+               class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i>
+                Back to Inventory
+            </a>
+
+        </div>
+
+        <div class="card shadow">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history"></i>
+                    Inventory Transactions
+                </h5>
+
+                <span class="badge bg-primary">
+                    {{ movements|length }} Records
+                </span>
+            </div>
+
+            <div class="card-body">
+
+                {% if movements is empty %}
+
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        No stock movements have been recorded yet.
+                    </div>
+
+                {% else %}
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover align-middle">
+
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Product</th>
+                                    <th>Movement</th>
+                                    <th>Quantity</th>
+                                    <th>Previous Stock</th>
+                                    <th>New Stock</th>
+                                    <th>Performed By</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for movement in movements %}
+
+                                    <tr>
+
+                                        <td>
+                                            {% if movement.createdAt %}
+                                                {{ movement.createdAt|date('M d, Y') }}
+                                                <div class="small text-muted">
+                                                    {{ movement.createdAt|date('h:i A') }}
+                                                </div>
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if movement.product %}
+                                                <strong>{{ movement.product.name }}</strong>
+                                            {% else %}
+                                                <span class="text-muted">
+                                                    Deleted product
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if movement.movementType == 'IN' %}
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-arrow-down-circle"></i>
+                                                    Stock In
+                                                </span>
+                                            {% elseif movement.movementType == 'OUT' %}
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-arrow-up-circle"></i>
+                                                    Stock Out
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">
+                                                    {{ movement.movementType }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            <strong>{{ movement.quantity }}</strong>
+                                        </td>
+
+                                        <td>{{ movement.previousStock }}</td>
+
+                                        <td>
+                                            <strong>{{ movement.newStock }}</strong>
+                                        </td>
+
+                                        <td>
+                                            {% if movement.performedBy %}
+                                                {{ movement.performedBy.firstName }}
+                                            {% else %}
+                                                <span class="text-muted">
+                                                    Unknown / Deleted User
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {{ movement.note ?: 'No note' }}
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <small class="text-muted">
+                        Showing the latest {{ movements|length }} stock movement records.
+                    </small>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\StockMovement;
 use App\Entity\Product;
 use App\Entity\User;
 use App\Form\ProductType;
@@ -194,66 +195,88 @@ final class StaffController extends AbstractController
         return $this->redirectToRoute('staff_products');
     }
 
-    // ADD OR REMOVE STOCK - OWN PRODUCTS ONLY
-    #[Route('/products/{id}/stock', name: 'staff_product_stock_update', methods: ['POST'])]
-    public function updateStock(
-        Request $request,
-        Product $product,
-        EntityManagerInterface $entityManager
-    ): Response {
-        $this->denyAccessUnlessGranted('ROLE_STAFF');
-        $this->denyUnlessProductOwner($product);
+    
+// ADD OR REMOVE STOCK - OWN PRODUCTS ONLY
+#[Route('/products/{id}/stock', name: 'staff_product_stock_update', methods: ['POST'])]
+public function updateStock(
+    Request $request,
+    Product $product,
+    EntityManagerInterface $entityManager
+): Response {
+    $this->denyAccessUnlessGranted('ROLE_STAFF');
+    $this->denyUnlessProductOwner($product);
 
-        $token = $request->getPayload()->getString('_token');
+    $token = $request->getPayload()->getString('_token');
 
-        if (!$this->isCsrfTokenValid(
-            'update-stock-' . $product->getId(),
-            $token
-        )) {
-            $this->addFlash('danger', 'Invalid security token.');
-            return $this->redirectToRoute('staff_products');
-        }
-
-        $quantity = filter_var(
-            $request->getPayload()->getString('quantity'),
-            FILTER_VALIDATE_INT
-        );
-
-        $operation = $request->getPayload()->getString('operation');
-
-        if ($quantity === false || $quantity <= 0) {
-            $this->addFlash('danger', 'Please enter a quantity greater than zero.');
-            return $this->redirectToRoute('staff_products');
-        }
-
-        $currentStock = $product->getStock();
-
-        if ($operation === 'add') {
-            $newStock = $currentStock + $quantity;
-        } elseif ($operation === 'remove') {
-            if ($quantity > $currentStock) {
-                $this->addFlash('danger', 'Cannot remove more stock than available.');
-                return $this->redirectToRoute('staff_products');
-            }
-
-            $newStock = $currentStock - $quantity;
-        } else {
-            $this->addFlash('danger', 'Invalid stock operation.');
-            return $this->redirectToRoute('staff_products');
-        }
-
-        $product->setStock($newStock);
-        $entityManager->flush();
-
-        $this->addFlash(
-            'success',
-            $operation === 'add'
-                ? $quantity . ' units added successfully.'
-                : $quantity . ' units removed successfully.'
-        );
-
+    if (!$this->isCsrfTokenValid(
+        'update-stock-' . $product->getId(),
+        $token
+    )) {
+        $this->addFlash('danger', 'Invalid security token.');
         return $this->redirectToRoute('staff_products');
     }
+
+    $quantity = filter_var(
+        $request->getPayload()->getString('quantity'),
+        FILTER_VALIDATE_INT
+    );
+
+    $operation = $request->getPayload()->getString('operation');
+
+    if ($quantity === false || $quantity <= 0) {
+        $this->addFlash('danger', 'Please enter a quantity greater than zero.');
+        return $this->redirectToRoute('staff_products');
+    }
+
+    $currentStock = $product->getStock();
+
+    if ($operation === 'add') {
+        $newStock = $currentStock + $quantity;
+        $movementType = 'IN';
+    } elseif ($operation === 'remove') {
+        if ($quantity > $currentStock) {
+            $this->addFlash('danger', 'Cannot remove more stock than available.');
+            return $this->redirectToRoute('staff_products');
+        }
+
+        $newStock = $currentStock - $quantity;
+        $movementType = 'OUT';
+    } else {
+        $this->addFlash('danger', 'Invalid stock operation.');
+        return $this->redirectToRoute('staff_products');
+    }
+
+    $user = $this->getUser();
+
+    if (!$user instanceof User) {
+        throw $this->createAccessDeniedException();
+    }
+
+    $movement = new StockMovement();
+    $movement->setProduct($product);
+    $movement->setMovementType($movementType);
+    $movement->setQuantity($quantity);
+    $movement->setPreviousStock($currentStock);
+    $movement->setNewStock($newStock);
+    $movement->setNote('Staff stock adjustment');
+    $movement->setCreatedAt(new \DateTimeImmutable());
+    $movement->setPerformedBy($user);
+
+    $product->setStock($newStock);
+
+    $entityManager->persist($movement);
+    $entityManager->flush();
+
+    $this->addFlash(
+        'success',
+        $operation === 'add'
+            ? $quantity . ' units added successfully.'
+            : $quantity . ' units removed successfully.'
+    );
+
+    return $this->redirectToRoute('staff_products');
+}
+
 
     // CHECK PRODUCT OWNERSHIP
     private function denyUnlessProductOwner(Product $product): void

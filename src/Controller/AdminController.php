@@ -21,61 +21,91 @@ final class AdminController extends AbstractController
     // ADMIN DASHBOARD
     // ==========================================
 
-    #[Route('/admin', name: 'app_admin')]
-    public function index(
-        UserRepository $userRepository,
-        ProductRepository $productRepository,
-        CategoryRepository $categoryRepository,
-        OrderRepository $orderRepository
-    ): Response {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    
+#[Route('/admin', name: 'app_admin')]
+public function index(
+    UserRepository $userRepository,
+    ProductRepository $productRepository,
+    CategoryRepository $categoryRepository,
+    OrderRepository $orderRepository
+): Response {
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        // Calculate total completed sales
-        $totalSales = $orderRepository->createQueryBuilder('o')
-            ->select('COALESCE(SUM(o.totalAmount), 0)')
-            ->where('o.status = :status')
-            ->setParameter('status', 'Completed')
-            ->getQuery()
-            ->getSingleScalarResult();
+    // INVENTORY THRESHOLD
+    $lowStockThreshold = 10;
 
-        // Count staff accounts
-        $totalStaff = $userRepository->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->where('u.roles LIKE :role')
-            ->setParameter('role', '%ROLE_STAFF%')
-            ->getQuery()
-            ->getSingleScalarResult();
+    // TOTAL STOCK UNITS
+    $totalStock = $productRepository->createQueryBuilder('p')
+        ->select('COALESCE(SUM(p.stock), 0)')
+        ->getQuery()
+        ->getSingleScalarResult();
 
-        return $this->render('admin/dashboard.html.twig', [
+    // LOW-STOCK PRODUCTS (1 TO 10 UNITS)
+    $lowStockProducts = $productRepository->createQueryBuilder('p')
+        ->where('p.stock > 0')
+        ->andWhere('p.stock <= :threshold')
+        ->setParameter('threshold', $lowStockThreshold)
+        ->orderBy('p.stock', 'ASC')
+        ->getQuery()
+        ->getResult();
 
-            // General statistics
-            'totalUsers' => $userRepository->count([]),
-            'totalStaff' => $totalStaff,
-            'totalProducts' => $productRepository->count([]),
-            'totalCategories' => $categoryRepository->count([]),
+    // OUT-OF-STOCK PRODUCTS
+    $outOfStockProducts = $productRepository->createQueryBuilder('p')
+        ->where('p.stock <= 0')
+        ->getQuery()
+        ->getResult();
 
-            // Order statistics
-            'totalOrders' => $orderRepository->count([]),
+    // TOTAL COMPLETED SALES
+    $totalSales = $orderRepository->createQueryBuilder('o')
+        ->select('COALESCE(SUM(o.totalAmount), 0)')
+        ->where('o.status = :status')
+        ->setParameter('status', 'Completed')
+        ->getQuery()
+        ->getSingleScalarResult();
 
-            'pendingOrders' => $orderRepository->count([
-                'status' => 'Pending',
-            ]),
+    // TOTAL STAFF ACCOUNTS
+    $totalStaff = $userRepository->createQueryBuilder('u')
+        ->select('COUNT(u.id)')
+        ->where('u.roles LIKE :role')
+        ->setParameter('role', '%ROLE_STAFF%')
+        ->getQuery()
+        ->getSingleScalarResult();
 
-            'processingOrders' => $orderRepository->count([
-                'status' => 'Processing',
-            ]),
+    return $this->render('admin/dashboard.html.twig', [
 
-            'completedOrders' => $orderRepository->count([
-                'status' => 'Completed',
-            ]),
+        // GENERAL STATISTICS
+        'totalUsers' => $userRepository->count([]),
+        'totalStaff' => $totalStaff,
+        'totalProducts' => $productRepository->count([]),
+        'totalCategories' => $categoryRepository->count([]),
 
-            'cancelledOrders' => $orderRepository->count([
-                'status' => 'Cancelled',
-            ]),
+        // INVENTORY STATISTICS
+        'totalStock' => (int) $totalStock,
+        'lowStockProducts' => $lowStockProducts,
+        'lowStockCount' => count($lowStockProducts),
+        'outOfStockProducts' => $outOfStockProducts,
+        'outOfStockCount' => count($outOfStockProducts),
+        'lowStockThreshold' => $lowStockThreshold,
 
-            'totalSales' => $totalSales,
-        ]);
-    }
+        // ORDER STATISTICS
+        'totalOrders' => $orderRepository->count([]),
+        'pendingOrders' => $orderRepository->count([
+            'status' => 'Pending',
+        ]),
+        'processingOrders' => $orderRepository->count([
+            'status' => 'Processing',
+        ]),
+        'completedOrders' => $orderRepository->count([
+            'status' => 'Completed',
+        ]),
+        'cancelledOrders' => $orderRepository->count([
+            'status' => 'Cancelled',
+        ]),
+
+        'totalSales' => $totalSales,
+    ]);
+}
+
 
     // ==========================================
     // USER MANAGEMENT - READ
