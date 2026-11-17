@@ -58,22 +58,50 @@
     }
 
     .back-link {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         color: #a3e635;
         text-decoration: none;
-        margin-bottom: 25px;
+        font-weight: 600;
+        transition: color 0.2s ease;
     }
 
     .back-link:hover {
         color: #bef264;
     }
+
+    .btn-back-store {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        color: #a3e635;
+        border: 1px solid #a3e635;
+        padding: 6px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-back-store:hover {
+        background: #a3e635;
+        color: #111;
+    }
 </style>
 
 <div class="details-container">
 
-    <a href="{{ path('customer_orders_index') }}" class="back-link">
-        ← Back to My Orders
-    </a>
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <a href="{{ path('customer_orders_index') }}" class="back-link">
+            <i class="bi bi-arrow-left"></i> Back to My Orders
+        </a>
+        <a href="{{ path('app_home') }}#products" class="btn-back-store">
+            <i class="bi bi-shop"></i> Back to Store
+        </a>
+    </div>
 
     <div class="details-card">
 
